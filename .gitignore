@@ -66,9 +66,8 @@ yarn-debug.log*
 /storage/*
 !/storage/.keep
 
-src/main/resources/application.properties
+application.properties
 
 .idea
 
 **/target/
-
