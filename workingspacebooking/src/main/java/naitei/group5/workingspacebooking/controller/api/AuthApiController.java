@@ -40,7 +40,6 @@ public class AuthApiController {
     public ResponseEntity<JwtResponse> refresh(@Valid @RequestBody RefreshRequest req) {
         return ResponseEntity.ok(authService.refresh(req));
     }
-
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestHeader("Authorization") String bearer) {
         String token = bearer != null && bearer.startsWith("Bearer ") ? bearer.substring(7) : null;
