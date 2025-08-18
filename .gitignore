@@ -82,6 +82,22 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
 .idea
 *.iws
 *.iml
@@ -103,3 +119,7 @@ build/
 .github/
 
 application.properties
+
+# VS Code (bổ sung)
+*.code-workspace
+.history/
