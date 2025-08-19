@@ -9,12 +9,13 @@ import java.util.List;
 
 public interface VenueService {
 
-    // Owner tạo yêu cầu/tạo venue
+    // ==== Owner use cases ====
     VenueResponseDto createVenueRequest(Integer ownerId, CreateVenueRequestDto requestDto);
 
-    // Lấy danh sách venue của 1 owner
     List<Venue> getVenuesByOwner(Integer ownerId);
 
-    // Lọc danh sách venue của owner theo tiêu chí
     List<VenueResponseDto> filterOwnerVenues(FilterVenueRequestDto req);
+
+    // ==== Renter use cases ====
+    List<VenueResponseDto> getVerifiedVenues();
 }
