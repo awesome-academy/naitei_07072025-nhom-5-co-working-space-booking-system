@@ -43,6 +43,13 @@ public enum ErrorCode {
     // SESSION
     USER_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "User session not found"),
 
+    //OWNER
+    OWNER_ID_REQUIRED(org.springframework.http.HttpStatus.BAD_REQUEST, "ownerId is required"),
+    INVALID_SORT(org.springframework.http.HttpStatus.BAD_REQUEST, "Invalid sort parameter"),
+
+    //CAPACITY
+    INVALID_CAPACITY_RANGE(org.springframework.http.HttpStatus.BAD_REQUEST, "capacityMin must be <= capacityMax"),
+
     // SYSTEM
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
 
