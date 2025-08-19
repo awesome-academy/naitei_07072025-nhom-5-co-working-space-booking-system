@@ -6,42 +6,47 @@ import naitei.group5.workingspacebooking.entity.User;
 import naitei.group5.workingspacebooking.entity.Venue;
 import naitei.group5.workingspacebooking.entity.VenueStyle;
 
-public class ConverterDto {
+public final class ConverterDto {
 
-    public static Venue toVenueEntity(CreateVenueRequestDto requestDto, User owner, VenueStyle venueStyle) {
+    
+    public static Venue toVenueEntity(CreateVenueRequestDto req, User owner, VenueStyle venueStyle) {
         return Venue.builder()
-                .name(requestDto.getName())
-                .description(requestDto.getDescription())
-                .capacity(requestDto.getCapacity())
-                .location(requestDto.getLocation())
-                .image(requestDto.getImage())
-                .verified(false) 
+                .name(req.name())
+                .description(req.description())
+                .capacity(req.capacity())
+                .location(req.location())
+                .image(req.image())
+                .verified(false)
                 .owner(owner)
                 .venueStyle(venueStyle)
                 .build();
     }
 
-    public static VenueResponseDto toVenueResponseDto(Venue venue) {
-        return VenueResponseDto.builder()
-                .id(venue.getId())
-                .name(venue.getName())
-                .description(venue.getDescription())
-                .capacity(venue.getCapacity())
-                .location(venue.getLocation())
-                .image(venue.getImage())
-                .verified(venue.getVerified())
-                .venueStyleName(venue.getVenueStyle() != null ? venue.getVenueStyle().getName() : null)
-                .ownerName(venue.getOwner() != null ? venue.getOwner().getName() : null)
-                .build();
+    
+    public static VenueResponseDto toVenueResponseDto(Venue v) {
+        Integer styleId = v.getVenueStyle() != null ? v.getVenueStyle().getId() : null;
+        String styleName = v.getVenueStyle() != null ? v.getVenueStyle().getName() : null;
+
+        return new VenueResponseDto(
+                v.getId(),
+                v.getName(),
+                v.getImage(),
+                v.getCapacity(),
+                v.getLocation(),
+                v.getVerified(),
+                styleId,
+                styleName
+        );
     }
 
-    public static void updateVenueFromDto(Venue venue, CreateVenueRequestDto requestDto, VenueStyle venueStyle) {
-        venue.setName(requestDto.getName());
-        venue.setDescription(requestDto.getDescription());
-        venue.setCapacity(requestDto.getCapacity());
-        venue.setLocation(requestDto.getLocation());
-        venue.setImage(requestDto.getImage());
-        
+    
+    public static void updateVenueFromDto(Venue venue, CreateVenueRequestDto req, VenueStyle venueStyle) {
+        venue.setName(req.name());
+        venue.setDescription(req.description());
+        venue.setCapacity(req.capacity());
+        venue.setLocation(req.location());
+        venue.setImage(req.image());
+
         if (venueStyle != null) {
             venue.setVenueStyle(venueStyle);
         }

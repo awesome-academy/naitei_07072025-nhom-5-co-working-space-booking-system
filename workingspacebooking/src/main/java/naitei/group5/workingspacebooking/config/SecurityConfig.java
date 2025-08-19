@@ -3,6 +3,7 @@ package naitei.group5.workingspacebooking.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,6 +12,7 @@ import static naitei.group5.workingspacebooking.constant.Endpoint.*;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableMethodSecurity 
 public class SecurityConfig {
 
     @Bean
@@ -23,7 +25,15 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(AUTH_LOGIN, AUTH_REFRESH, AUTH_LOGOUT, AUTH_REGISTER_RENTER, AUTH_REGISTER_OWNER).permitAll()
+                        .requestMatchers(
+                            AUTH_LOGIN, 
+                            AUTH_REFRESH, 
+                            AUTH_LOGOUT, 
+                            AUTH_REGISTER_RENTER, 
+                            AUTH_REGISTER_OWNER,
+                            AUTH_REGISTER,
+                            OWNER_VENUES
+                        ).permitAll()
                         .anyRequest().authenticated()
                 );
         return http.build();
