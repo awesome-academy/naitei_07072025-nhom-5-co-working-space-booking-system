@@ -28,10 +28,10 @@ public class SecurityConfig {
                         .requestMatchers(
                             AUTH_LOGIN, 
                             AUTH_REFRESH, 
-                            AUTH_LOGOUT, 
+                            AUTH_LOGOUT,
+                            AUTH_RECOVERY,
                             AUTH_REGISTER_RENTER, 
                             AUTH_REGISTER_OWNER,
-                            AUTH_REGISTER,
                             OWNER_VENUES
                         ).permitAll()
                         .anyRequest().authenticated()
