@@ -48,4 +48,13 @@ public class JwtUtils {
     public String getRole(String token)  { return (String) parse(token).getBody().get("role"); }
     public Integer getSessionId(String token) { return (Integer) parse(token).getBody().get("sid"); }
     public boolean isExpired(String token) { return parse(token).getBody().getExpiration().before(new Date()); }
+
+    public boolean validate(String token) {
+        try {
+            parse(token);
+            return !isExpired(token);
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
 }

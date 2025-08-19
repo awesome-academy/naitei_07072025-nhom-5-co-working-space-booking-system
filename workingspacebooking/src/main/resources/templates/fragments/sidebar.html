@@ -1,9 +1,26 @@
-<!-- ===== Fragment: Sidebar =====
-     Include bằng: <div th:replace="fragments/sidebar :: sidebar"></div>
--->
-<aside>
-    <nav>
-        <a href="#">Dashboard</a>
-        <a href="#">Products</a>
-    </nav>
-</aside>
+<!-- templates/fragments/sidebar.html -->
+<div th:fragment="sidebarFragment" class="sidebar flex-column p-3">
+    <h4 class="text-white">Admin Dashboard</h4>
+    <hr class="text-secondary">
+
+    <div class="d-grid gap-2">
+        <a class="btn btn-outline-light" th:href="@{/admin/dashboard}"
+           th:classappend="${currentUri == '/admin/dashboard'} ? ' active' : ''">
+            Dashboard
+        </a>
+
+        <a class="btn btn-outline-light" th:href="@{/admin/users}"
+           th:classappend="${currentUri == '/admin/users/user-list'} ? ' active' : ''">
+            Quản lí người dùng
+        </a>
+
+        <a class="btn btn-outline-light" th:href="@{/admin/notifications/new}"
+           th:classappend="${currentUri == '/admin/notifications/new'} ? ' active' : ''">
+            Tạo báo cáo hệ thống
+        </a>
+
+        <form th:action="@{/admin/logout}" method="post">
+            <button type="submit" class="btn btn-outline-danger w-100">Đăng xuất</button>
+        </form>
+    </div>
+</div>
