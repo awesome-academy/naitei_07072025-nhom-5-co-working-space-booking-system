@@ -1,6 +1,9 @@
 package naitei.group5.workingspacebooking.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import naitei.group5.workingspacebooking.dto.request.CreateVenueRequestDto;
 import naitei.group5.workingspacebooking.dto.request.FilterVenueRequestDto;
 import naitei.group5.workingspacebooking.dto.response.VenueResponseDto;
@@ -16,11 +19,8 @@ import naitei.group5.workingspacebooking.repository.VenueStyleRepository;
 import naitei.group5.workingspacebooking.service.VenueService;
 import naitei.group5.workingspacebooking.specification.VenueSpecs;
 import naitei.group5.workingspacebooking.utils.ConverterDto;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +31,9 @@ public class VenueServiceImpl implements VenueService {
     private final VenueStyleRepository venueStyleRepository;
     private final UserRepository userRepository;
 
+    // ==== Owner use cases ====
     @Override
     public List<Venue> getVenuesByOwner(Integer ownerId) {
-        //Check owner tồn tại trước khi truy vấn
         if (!userRepository.existsById(ownerId)) {
             throw new UserNotFoundException();
         }
@@ -51,7 +51,7 @@ public class VenueServiceImpl implements VenueService {
             throw new IllegalArgumentException("User does not have owner permission");
         }
 
-        // 2) Kiểm tra venue style (record accessor)
+        // 2) Kiểm tra venue style
         VenueStyle venueStyle = venueStyleRepository.findById(requestDto.venueStyleId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Venue style not found with ID: " + requestDto.venueStyleId()));
@@ -66,7 +66,6 @@ public class VenueServiceImpl implements VenueService {
 
     @Override
     public List<VenueResponseDto> filterOwnerVenues(FilterVenueRequestDto req) {
-        // 1) Validate đầu vào
         if (req.ownerId() == null) {
             throw new OwnerIdRequiredException();
         }
@@ -77,7 +76,7 @@ public class VenueServiceImpl implements VenueService {
                 && req.capacityMin() > req.capacityMax()) {
             throw new InvalidCapacityRangeException();
         }
-        // build spec từ DTO
+
         var spec = VenueSpecs.byFilter(
                 req.ownerId(),
                 req.name(),
@@ -89,13 +88,18 @@ public class VenueServiceImpl implements VenueService {
                 req.verified()
         );
 
-        // query + sort
         List<Venue> venues = venueRepository.findAll(spec);
-
-        // map entity -> dto
         return venues.stream()
                 .map(ConverterDto::toVenueResponseDto)
                 .toList();
     }
 
+    // ==== Renter use cases ====
+    @Override
+    public List<VenueResponseDto> getVerifiedVenues() {
+        return venueRepository.findByVerified(true)
+                .stream()
+                .map(ConverterDto::toVenueResponseDto)
+                .toList();
+    }
 }

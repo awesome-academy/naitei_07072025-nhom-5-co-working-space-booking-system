@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+
 @Repository
 public interface VenueRepository extends JpaRepository<Venue, Integer>, JpaSpecificationExecutor<Venue> {
 
@@ -27,4 +28,7 @@ public interface VenueRepository extends JpaRepository<Venue, Integer>, JpaSpeci
     // Tìm tất cả venue của 1 owner, load kèm venueStyle
     @EntityGraph(attributePaths = {"venueStyle"})
     List<Venue> findByOwnerId(Integer ownerId);
+
+    // Tìm tất cả venue đã verified
+    List<Venue> findByVerified(Boolean verified);
 }

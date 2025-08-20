@@ -8,12 +8,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import static naitei.group5.workingspacebooking.constant.Endpoint.*;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableMethodSecurity 
+@EnableMethodSecurity
 public class SecurityConfig {
+
+    private final JwtAuthFilter jwtAuthFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -26,16 +30,18 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                            AUTH_LOGIN, 
-                            AUTH_REFRESH, 
-                            AUTH_LOGOUT,
-                            AUTH_RECOVERY,
-                            AUTH_REGISTER_RENTER, 
-                            AUTH_REGISTER_OWNER,
-                            OWNER_VENUES
+                                AUTH_LOGIN,
+                                AUTH_REFRESH,
+                                AUTH_LOGOUT,
+                                AUTH_RECOVERY,
+                                AUTH_REGISTER_RENTER,
+                                AUTH_REGISTER_OWNER,
+                                OWNER_VENUES
                         ).permitAll()
+                        .requestMatchers(RENTER_VENUES, RENTER_VENUES_SUB).hasRole("renter") // renter bắt buộc login
                         .anyRequest().authenticated()
-                );
+                )
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }
