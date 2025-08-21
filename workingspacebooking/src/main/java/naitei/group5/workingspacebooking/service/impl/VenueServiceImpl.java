@@ -1,6 +1,8 @@
 package naitei.group5.workingspacebooking.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import naitei.group5.workingspacebooking.dto.request.FilterVenueRenterRequestDto;
+import naitei.group5.workingspacebooking.specification.RenterVenueSpecs;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +40,6 @@ public class VenueServiceImpl implements VenueService {
     private final VenueStyleRepository venueStyleRepository;
     private final UserRepository userRepository;
     private final BookingDetailRepository bookingDetailRepository;
-
     private final TimeSlotCalculator timeSlotCalculator;
 
     // ==== Owner use cases ====
@@ -53,7 +54,6 @@ public class VenueServiceImpl implements VenueService {
     @Override
     @Transactional
     public VenueResponseDto createVenueRequest(Integer ownerId, CreateVenueRequestDto requestDto) {
-        // 1) Kiểm tra owner hợp lệ & đúng role
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Owner not found with ID: " + ownerId));
 
@@ -61,15 +61,11 @@ public class VenueServiceImpl implements VenueService {
             throw new IllegalArgumentException("User does not have owner permission");
         }
 
-        // 2) Kiểm tra venue style
         VenueStyle venueStyle = venueStyleRepository.findById(requestDto.venueStyleId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Venue style not found with ID: " + requestDto.venueStyleId()));
 
-        // 3) Map DTO -> Entity
         Venue venue = ConverterDto.toVenueEntity(requestDto, owner, venueStyle);
-
-        // 4) Lưu & map Entity -> Response DTO
         Venue savedVenue = venueRepository.save(venue);
         return ConverterDto.toVenueResponseDto(savedVenue);
     }
@@ -112,9 +108,10 @@ public class VenueServiceImpl implements VenueService {
                 .map(ConverterDto::toVenueResponseDto)
                 .toList();
     }
+
+    // Owner xem chi tiết venue (bao gồm busy slots & available slots)
     @Override
     public VenueDetailResponseDto getVenueDetailByOwner(Integer ownerId, Integer venueId) {
-
         var venue = venueRepository.findByIdAndOwnerIdWithAllDetails(venueId, ownerId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Venue not found with ID: " + venueId + " for owner: " + ownerId));
@@ -122,20 +119,52 @@ public class VenueServiceImpl implements VenueService {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end   = start.plusDays(7);
 
-        // Busy (CONFIRMED)
         List<TimeSlotDto> busy = bookingDetailRepository
                 .findBusySlotsByVenueAndTimeRange(venueId, start, end)
                 .stream()
                 .map(bd -> new TimeSlotDto(bd.getStartTime(), bd.getEndTime()))
                 .toList();
 
-        // Gộp & tính free
         var mergedBusy     = timeSlotCalculator.mergeBusy(start, end, busy);
         var availableSlots = timeSlotCalculator.calcAvailable(start, end, mergedBusy);
 
-        // Gọi Converter đúng chữ ký mới: (venue, availableSlots, busySlots)
         return ConverterDto.toVenueDetailResponseDto(venue, availableSlots, mergedBusy);
     }
-    
-}
 
+    // Renter filter venue theo thời gian, tuần, sức chứa
+    @Override
+    public List<VenueResponseDto> filterVenuesForRenter(FilterVenueRenterRequestDto req) {
+        if (req.capacityMin() != null && req.capacityMax() != null
+                && req.capacityMin() > req.capacityMax()) {
+            throw new InvalidCapacityRangeException();
+        }
+
+        if (req.startTime() != null && req.endTime() != null
+                && req.startTime().isAfter(req.endTime())) {
+            throw new InvalidTimeRangeException();
+        }
+
+        var spec = RenterVenueSpecs.byFilter(
+                req.name(),
+                req.location(),
+                req.venueStyleName(),
+                req.venueStyleId(),
+                req.capacityMin(),
+                req.capacityMax(),
+                req.startTime(),
+                req.endTime(),
+                req.weekDays()
+        );
+
+        List<Venue> venues = venueRepository.findAll(spec);
+
+        return venues.stream()
+                .map(v -> ConverterDto.toVenueResponseDto(
+                        v,
+                        req.startTime(),
+                        req.endTime(),
+                        req.weekDays()
+                ))
+                .toList();
+    }
+}

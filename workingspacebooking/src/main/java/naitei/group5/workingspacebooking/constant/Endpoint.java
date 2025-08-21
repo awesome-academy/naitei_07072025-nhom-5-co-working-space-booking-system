@@ -15,9 +15,10 @@ public class Endpoint {
     public static final String AUTH_RECOVERY  = "/api/auth/recover/**";
     public static final String AUTH_RECOVERY_CONFIRM = "/api/auth/recover/confirm?token=";
 
-    // từ task 91337
+    // renter
     public static final String RENTER_VENUES = "/api/venues";
     public static final String RENTER_VENUES_SUB = "/api/venues/**";
-
+    public static final String RENTER_VENUES_FILTER = "/api/venues/filter";
+    //admin
     public static final String ADMIN_BASE = "/admin/**";
 }
