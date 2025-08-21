@@ -1,6 +1,7 @@
 package naitei.group5.workingspacebooking.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import naitei.group5.workingspacebooking.service.EmailService;
 import org.springframework.stereotype.Service;
 import naitei.group5.workingspacebooking.dto.response.UserResponse;
 import naitei.group5.workingspacebooking.entity.User;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class AdminServiceImpl implements AdminService {
 
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     @Override
     public List<UserResponse> getAllUsers() {
@@ -42,32 +44,36 @@ public class AdminServiceImpl implements AdminService {
                 .role(user.getRole())
                 .build();
     }
-    @Override
-    public UserResponse getUserById(Integer id) {
-        return userRepository.findById(id)
-                .map(this::mapToResponse)
-                .orElseThrow(() -> new RuntimeException("User not found with id " + id));
-    }
-
-    @Override
-    public UserResponse updateUser(Integer id, UserResponse updatedUser) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id " + id));
-
-        // cập nhật thông tin
-        user.setName(updatedUser.getName());
-        user.setEmail(updatedUser.getEmail());
-        user.setPhone(updatedUser.getPhone());
-        user.setRole(updatedUser.getRole());
-
-        User saved = userRepository.save(user);
-        return mapToResponse(saved);
-    }
 
     @Override
     public UserResponse getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found with email " + email));
         return mapToResponse(user);
+    }
+
+    @Override
+    public UserResponse approveOwner(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id " + userId));
+
+        if (user.getRole() != UserRole.pending_owner) {
+            throw new RuntimeException("User is not pending_owner");
+        }
+
+        // Cập nhật role
+        user.setRole(UserRole.owner);
+        User saved = userRepository.save(user);
+
+        // Gửi mail thông báo
+        emailService.sendSimpleMessage(
+                user.getEmail(),
+                "Phê duyệt trở thành chủ sở hữu",
+                "Xin chào " + user.getName() + ",\n\n" +
+                        "Yêu cầu trở thành chủ sở hữu của bạn đã được phê duyệt. Giờ bạn đã có quyền owner.\n\n" +
+                        "Trân trọng,\nĐội ngũ hỗ trợ."
+        );
+
+        return mapToResponse(saved);
     }
 }
