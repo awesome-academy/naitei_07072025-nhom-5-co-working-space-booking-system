@@ -9,7 +9,6 @@ public interface AdminService {
     List<UserResponse> getAllUsers();
     List<UserResponse> getUsersByRole(UserRole role);
 
-    UserResponse getUserById(Integer id);
-    UserResponse updateUser(Integer id, UserResponse updatedUser);
     UserResponse getUserByEmail(String email);
+    UserResponse approveOwner(Integer userId);
 }
