@@ -19,6 +19,8 @@ public class Endpoint {
     public static final String RENTER_VENUES = "/api/venues";
     public static final String RENTER_VENUES_SUB = "/api/venues/**";
     public static final String RENTER_VENUES_FILTER = "/api/venues/filter";
+
     //admin
     public static final String ADMIN_BASE = "/admin/**";
+
 }
