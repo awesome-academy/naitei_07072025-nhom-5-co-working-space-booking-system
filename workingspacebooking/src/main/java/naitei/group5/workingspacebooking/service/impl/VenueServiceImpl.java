@@ -6,20 +6,27 @@ import org.springframework.transaction.annotation.Transactional;
 
 import naitei.group5.workingspacebooking.dto.request.CreateVenueRequestDto;
 import naitei.group5.workingspacebooking.dto.request.FilterVenueRequestDto;
+import naitei.group5.workingspacebooking.dto.response.TimeSlotDto;
+import naitei.group5.workingspacebooking.dto.response.VenueDetailResponseDto;
 import naitei.group5.workingspacebooking.dto.response.VenueResponseDto;
 import naitei.group5.workingspacebooking.entity.User;
 import naitei.group5.workingspacebooking.entity.Venue;
 import naitei.group5.workingspacebooking.entity.VenueStyle;
 import naitei.group5.workingspacebooking.entity.enums.UserRole;
+import naitei.group5.workingspacebooking.entity.BookingDetail;
 import naitei.group5.workingspacebooking.exception.ResourceNotFoundException;
 import naitei.group5.workingspacebooking.exception.custom.*;
 import naitei.group5.workingspacebooking.repository.UserRepository;
 import naitei.group5.workingspacebooking.repository.VenueRepository;
 import naitei.group5.workingspacebooking.repository.VenueStyleRepository;
+import naitei.group5.workingspacebooking.repository.BookingDetailRepository;
 import naitei.group5.workingspacebooking.service.VenueService;
+import naitei.group5.workingspacebooking.service.common.TimeSlotCalculator;
 import naitei.group5.workingspacebooking.specification.VenueSpecs;
 import naitei.group5.workingspacebooking.utils.ConverterDto;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,6 +37,9 @@ public class VenueServiceImpl implements VenueService {
     private final VenueRepository venueRepository;
     private final VenueStyleRepository venueStyleRepository;
     private final UserRepository userRepository;
+    private final BookingDetailRepository bookingDetailRepository;
+
+    private final TimeSlotCalculator timeSlotCalculator;
 
     // ==== Owner use cases ====
     @Override
@@ -102,4 +112,30 @@ public class VenueServiceImpl implements VenueService {
                 .map(ConverterDto::toVenueResponseDto)
                 .toList();
     }
+    @Override
+    public VenueDetailResponseDto getVenueDetailByOwner(Integer ownerId, Integer venueId) {
+
+        var venue = venueRepository.findByIdAndOwnerIdWithAllDetails(venueId, ownerId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Venue not found with ID: " + venueId + " for owner: " + ownerId));
+
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime end   = start.plusDays(7);
+
+        // Busy (CONFIRMED)
+        List<TimeSlotDto> busy = bookingDetailRepository
+                .findBusySlotsByVenueAndTimeRange(venueId, start, end)
+                .stream()
+                .map(bd -> new TimeSlotDto(bd.getStartTime(), bd.getEndTime()))
+                .toList();
+
+        // Gộp & tính free
+        var mergedBusy     = timeSlotCalculator.mergeBusy(start, end, busy);
+        var availableSlots = timeSlotCalculator.calcAvailable(start, end, mergedBusy);
+
+        // Gọi Converter đúng chữ ký mới: (venue, availableSlots, busySlots)
+        return ConverterDto.toVenueDetailResponseDto(venue, availableSlots, mergedBusy);
+    }
+    
 }
+

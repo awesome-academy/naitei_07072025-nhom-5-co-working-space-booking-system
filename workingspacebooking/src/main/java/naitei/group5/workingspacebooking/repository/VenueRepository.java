@@ -31,4 +31,18 @@ public interface VenueRepository extends JpaRepository<Venue, Integer>, JpaSpeci
 
     // Tìm tất cả venue đã verified
     List<Venue> findByVerified(Boolean verified);
+
+    // Xem cụ thể venue của 1 owner
+    @Query("""
+    SELECT DISTINCT v
+    FROM Venue v
+    JOIN FETCH v.owner o
+    JOIN FETCH v.venueStyle vs
+    LEFT JOIN FETCH v.prices p
+    WHERE v.id = :venueId
+      AND o.id = :ownerId
+    """)
+    Optional<Venue> findByIdAndOwnerIdWithAllDetails(@Param("venueId") Integer venueId,
+                                                 @Param("ownerId") Integer ownerId);
+
 }
