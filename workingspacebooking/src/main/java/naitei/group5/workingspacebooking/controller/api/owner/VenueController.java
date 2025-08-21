@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import naitei.group5.workingspacebooking.dto.request.CreateVenueRequestDto;
 import naitei.group5.workingspacebooking.dto.request.FilterVenueRequestDto;
+import naitei.group5.workingspacebooking.dto.response.VenueDetailResponseDto;
 import naitei.group5.workingspacebooking.dto.response.VenueResponseDto;
 import naitei.group5.workingspacebooking.entity.Venue;
 import naitei.group5.workingspacebooking.service.VenueService;
@@ -26,12 +27,10 @@ public class VenueController {
     private final VenueService venueService;
 
     // GET /api/owner/venues?ownerId=123  (list venue của owner)
-    @GetMapping("/{ownerId}")
-    public List<VenueResponseDto> listMyVenues(@PathVariable Integer ownerId) {
+    @GetMapping(params = "ownerId")
+    public List<VenueResponseDto> listMyVenues(@RequestParam Integer ownerId) {
         return venueService.getVenuesByOwner(ownerId)
-                .stream()
-                .map(ConverterDto::toVenueResponseDto)
-                .toList();
+                .stream().map(ConverterDto::toVenueResponseDto).toList();
     }
 
     // POST /api/owner/venues  (owner tạo venue)
@@ -49,5 +48,15 @@ public class VenueController {
     @PostMapping("/filter")
     public List<VenueResponseDto> filterVenues(@RequestBody FilterVenueRequestDto req) {
         return venueService.filterOwnerVenues(req);
+    }
+
+    // GET /api/owner/venues/{venueId}/detail?ownerId=123 (Xem chi tiết 1 venue + slot trống)
+    @GetMapping("/{venueId}")
+    public ResponseEntity<VenueDetailResponseDto> getMyVenueDetail(
+            @PathVariable Integer venueId,
+            @RequestParam @Positive Integer ownerId
+    ) {
+        var dto = venueService.getVenueDetailByOwner(ownerId, venueId);
+        return ResponseEntity.ok(dto);
     }
 }
