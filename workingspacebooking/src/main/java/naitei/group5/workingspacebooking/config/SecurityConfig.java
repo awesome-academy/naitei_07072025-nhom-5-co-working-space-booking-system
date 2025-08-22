@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
 import static naitei.group5.workingspacebooking.constant.Endpoint.*;
 
 @Configuration
@@ -30,6 +31,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                // Admin login routes
+                                "/", "/admin/login",
+                                // Static resources
+                                "/css/**", "/js/**", "/images/**", "/static/**",
+                                // Existing API auth endpoints
                                 AUTH_LOGIN,
                                 AUTH_REFRESH,
                                 AUTH_LOGOUT,
@@ -38,6 +44,8 @@ public class SecurityConfig {
                                 AUTH_REGISTER_OWNER,
                                 OWNER_VENUES
                         ).permitAll()
+                        // Admin routes require ADMIN role
+                        .requestMatchers(ADMIN_BASE).hasRole("admin")
                         .requestMatchers(RENTER_VENUES, RENTER_VENUES_SUB).hasRole("renter") // renter bắt buộc login
                         .anyRequest().authenticated()
                 )
