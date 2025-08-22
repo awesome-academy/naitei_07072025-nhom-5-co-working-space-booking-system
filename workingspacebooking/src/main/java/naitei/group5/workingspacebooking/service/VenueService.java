@@ -1,6 +1,7 @@
 package naitei.group5.workingspacebooking.service;
 
 import naitei.group5.workingspacebooking.dto.request.CreateVenueRequestDto;
+import naitei.group5.workingspacebooking.dto.request.FilterVenueRenterRequestDto;
 import naitei.group5.workingspacebooking.dto.request.FilterVenueRequestDto;
 import naitei.group5.workingspacebooking.dto.response.VenueDetailResponseDto;
 import naitei.group5.workingspacebooking.dto.response.VenueResponseDto;
@@ -17,11 +18,12 @@ public interface VenueService {
 
     List<VenueResponseDto> filterOwnerVenues(FilterVenueRequestDto req);
 
-    // ==== Renter use cases ====
-    List<VenueResponseDto> getVerifiedVenues();
-    
     //Xem chi tiết venue của owner
     VenueDetailResponseDto getVenueDetailByOwner(Integer ownerId, Integer venueId);
 
+    // ==== Renter use cases ====
+    List<VenueResponseDto> getVerifiedVenues();
+
+    List<VenueResponseDto> filterVenuesForRenter(FilterVenueRenterRequestDto req);
 
 }

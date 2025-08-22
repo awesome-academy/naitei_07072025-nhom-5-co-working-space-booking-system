@@ -10,7 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 import static naitei.group5.workingspacebooking.constant.Endpoint.*;
 
 @Configuration
@@ -46,7 +45,8 @@ public class SecurityConfig {
                         ).permitAll()
                         // Admin routes require ADMIN role
                         .requestMatchers(ADMIN_BASE).hasRole("admin")
-                        .requestMatchers(RENTER_VENUES, RENTER_VENUES_SUB).hasRole("renter") // renter bắt buộc login
+                        // Renter routes require RENTER role
+                        .requestMatchers(RENTER_VENUES, RENTER_VENUES_SUB, RENTER_VENUES_FILTER).hasRole("renter")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

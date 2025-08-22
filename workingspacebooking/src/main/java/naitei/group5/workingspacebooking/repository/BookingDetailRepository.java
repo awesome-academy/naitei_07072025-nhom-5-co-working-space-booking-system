@@ -12,6 +12,7 @@ import java.util.List;
 @Repository
 public interface BookingDetailRepository extends JpaRepository<BookingDetail, Integer> {
 
+    // Method
     @Query("""
         select bd
         from BookingDetail bd
@@ -26,5 +27,10 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, In
             @Param("venueId") Integer venueId,
             @Param("start") LocalDateTime start,
             @Param("end")   LocalDateTime end
+    );
+
+    // Method lọc khoảng startTime
+    List<BookingDetail> findByBooking_Venue_IdAndStartTimeBetween(
+            Integer venueId, LocalDateTime start, LocalDateTime end
     );
 }

@@ -50,6 +50,9 @@ public enum ErrorCode {
     //CAPACITY
     INVALID_CAPACITY_RANGE(org.springframework.http.HttpStatus.BAD_REQUEST, "capacityMin must be <= capacityMax"),
 
+    // TIME
+    INVALID_TIME_RANGE(HttpStatus.BAD_REQUEST, "startTime must be <= endTime"),
+
     // SYSTEM
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
 
