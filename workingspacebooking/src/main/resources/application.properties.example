@@ -18,3 +18,9 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 app.jwt.secret=
 app.jwt.access-exp-ms=
 app.jwt.refresh-exp-ms=
+
+#VN pay
+vnpay.tmn-code=
+vnpay.hash-secret=
+vnpay.pay-url=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+vnpay.return-url=http://localhost:8080/api/payment/vnpay-return

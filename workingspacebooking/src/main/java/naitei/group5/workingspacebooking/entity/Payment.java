@@ -2,6 +2,7 @@ package naitei.group5.workingspacebooking.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import naitei.group5.workingspacebooking.entity.enums.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,5 +29,6 @@ public class Payment {
 
     private LocalDateTime paidTime;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
 }

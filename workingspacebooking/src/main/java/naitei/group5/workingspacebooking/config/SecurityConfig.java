@@ -41,7 +41,8 @@ public class SecurityConfig {
                                 AUTH_RECOVERY,
                                 AUTH_REGISTER_RENTER,
                                 AUTH_REGISTER_OWNER,
-                                OWNER_VENUES
+                                OWNER_VENUES,
+                                "/api/payment/**"
                         ).permitAll()
                         // Admin routes require ADMIN role
                         .requestMatchers(ADMIN_BASE).hasRole("admin")
