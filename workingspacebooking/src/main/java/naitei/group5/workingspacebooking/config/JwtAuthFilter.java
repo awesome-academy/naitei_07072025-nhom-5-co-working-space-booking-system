@@ -46,6 +46,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             try {
                 var claims = jwt.parse(token).getBody();
                 Integer sid = (Integer) claims.get("sid");
+                Integer userId = claims.get("userId", Integer.class);
                 String email = claims.getSubject();
                 String role  = (String) claims.get("role");
 
@@ -54,8 +55,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 boolean sessionActive = sessionRepo.findByIdAndLogoutTimeIsNull(sid).isPresent();
 
                 if (!expired && !revoked && sessionActive) {
+
+                    JwtUserDetails userDetails = new JwtUserDetails(userId, email, role);
                     var auth = new UsernamePasswordAuthenticationToken(
-                            email, null, List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                            userDetails, null, userDetails.getAuthorities()
                     );
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }

@@ -1,9 +1,18 @@
 package naitei.group5.workingspacebooking.utils;
 
 import naitei.group5.workingspacebooking.dto.request.CreateVenueRequestDto;
-import naitei.group5.workingspacebooking.dto.response.*;
+import naitei.group5.workingspacebooking.dto.response.PriceResponseDto;
+import naitei.group5.workingspacebooking.dto.response.BookingDetailResponseDto;
+import naitei.group5.workingspacebooking.dto.response.BookingResponseDto;
+import naitei.group5.workingspacebooking.dto.response.PriceDto;
+import naitei.group5.workingspacebooking.dto.response.TimeSlotResponseDto;
+import naitei.group5.workingspacebooking.dto.response.VenueDetailResponseDto;
+import naitei.group5.workingspacebooking.dto.response.VenueResponseDto;
 import naitei.group5.workingspacebooking.entity.*;
 import naitei.group5.workingspacebooking.entity.enums.WeekDay;
+import naitei.group5.workingspacebooking.dto.response.VenueDetailRenterResponseDto;
+import naitei.group5.workingspacebooking.dto.response.BusySlotDto;
+
 
 import java.time.LocalTime;
 import java.util.*;
@@ -101,9 +110,9 @@ public final class ConverterDto {
     }
 
     public static VenueDetailResponseDto toVenueDetailResponseDto(
-            Venue v,
-            List<TimeSlotDto> availableSlots,
-            List<TimeSlotDto> busySlots
+        Venue v,
+        List<TimeSlotResponseDto> availableSlots,
+        List<TimeSlotResponseDto> busySlots
     ) {
         return new VenueDetailResponseDto(
                 v.getId(),
@@ -155,9 +164,9 @@ public final class ConverterDto {
         );
     }
 
-    // Booking
-    public static BookingDto toBookingDto(Booking b) {
-        return new BookingDto(
+    //Booking
+    public static BookingResponseDto toBookingDto(Booking b) {
+        return new BookingResponseDto(
                 b.getId(),
                 b.getUser() != null ? b.getUser().getId() : null,
                 b.getStatus().name(),
@@ -166,8 +175,8 @@ public final class ConverterDto {
         );
     }
 
-    public static BookingDetailDto toBookingDetailDto(BookingDetail bd) {
-        return new BookingDetailDto(
+     public static BookingDetailResponseDto toBookingDetailDto(BookingDetail bd) {
+        return new BookingDetailResponseDto(
                 bd.getId(),
                 bd.getStartTime(),
                 bd.getEndTime()

@@ -1,7 +1,7 @@
 package naitei.group5.workingspacebooking.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import naitei.group5.workingspacebooking.dto.response.TimeSlotDto;
+import naitei.group5.workingspacebooking.dto.response.TimeSlotResponseDto;
 import naitei.group5.workingspacebooking.dto.response.VenueDetailResponseDto;
 import naitei.group5.workingspacebooking.service.common.TimeSlotCalculator;
 import naitei.group5.workingspacebooking.entity.Venue;
@@ -33,17 +33,17 @@ public class VenueDetailServiceImpl implements VenueDetailService {
         Venue venue = venueRepository.findByIdWithDetails(venueId)
                 .orElseThrow(() -> new ResourceNotFoundException("Venue not found with ID: " + venueId));
 
-        List<TimeSlotDto> busySlots = bookingDetailRepository
+        List<TimeSlotResponseDto> busySlots = bookingDetailRepository
         .findBusySlotsByVenueAndTimeRange(venueId, start, end)
         .stream()
-        .map(bd -> new TimeSlotDto(bd.getStartTime(), bd.getEndTime()))
+        .map(bd -> new TimeSlotResponseDto(bd.getStartTime(), bd.getEndTime()))
         .toList();
 
         // merge busy slots trước
-        List<TimeSlotDto> mergedBusy = timeSlotCalculator.mergeBusy(start, end, busySlots);
+        List<TimeSlotResponseDto> mergedBusy = timeSlotCalculator.mergeBusy(start, end, busySlots);
 
         // tính available slots từ busy
-        List<TimeSlotDto> availableSlots = timeSlotCalculator.calcAvailable(start, end, mergedBusy);
+        List<TimeSlotResponseDto> availableSlots = timeSlotCalculator.calcAvailable(start, end, mergedBusy);
 
         // truyền đủ 2 tham số
         return ConverterDto.toVenueDetailResponseDto(venue, availableSlots, mergedBusy);
