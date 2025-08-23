@@ -33,4 +33,14 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, In
     List<BookingDetail> findByBooking_Venue_IdAndStartTimeBetween(
             Integer venueId, LocalDateTime start, LocalDateTime end
     );
+
+    @Query("SELECT CASE WHEN COUNT(bd) > 0 THEN true ELSE false END " +
+            "FROM BookingDetail bd " +
+            "JOIN bd.booking b " +
+            "WHERE b.venue.id = :venueId " +
+            "AND b.status = 'booked' " +
+            "AND (bd.startTime < :endTime AND bd.endTime > :startTime)")
+    boolean existsConflict(@Param("venueId") Integer venueId,
+                           @Param("startTime") LocalDateTime startTime,
+                           @Param("endTime") LocalDateTime endTime);
 }
