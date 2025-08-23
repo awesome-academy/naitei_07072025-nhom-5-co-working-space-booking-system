@@ -5,6 +5,10 @@ import naitei.group5.workingspacebooking.dto.request.UpdateVenueRequestDto;
 import naitei.group5.workingspacebooking.dto.response.*;
 import naitei.group5.workingspacebooking.entity.*;
 import naitei.group5.workingspacebooking.entity.enums.WeekDay;
+import naitei.group5.workingspacebooking.dto.response.VenueDetailRenterResponseDto;
+import naitei.group5.workingspacebooking.dto.response.BusySlotDto;
+import naitei.group5.workingspacebooking.dto.response.UpdateUserProfileResponseDto;
+
 
 import java.time.LocalTime;
 import java.util.*;
@@ -222,4 +226,13 @@ public final class ConverterDto {
                 .role(user.getRole())
                 .build();
     }
+
+	public static UpdateUserProfileResponseDto toUpdateUserProfileResponseDto(User user) {
+        return UpdateUserProfileResponseDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .build();
+    }	
 }
