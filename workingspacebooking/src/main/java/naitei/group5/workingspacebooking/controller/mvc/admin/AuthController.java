@@ -36,7 +36,7 @@ public class AuthController {
                           HttpServletRequest request) {
         try {
             var jwt = authService.login(form, request);
-            if (!"admin".equals(jwt.getRole())) {
+            if (!"admin".equalsIgnoreCase(jwt.getRole())) {
                 model.addAttribute("loginError", "auth.admin.role.required");
                 return "admin/auth/login";
             }

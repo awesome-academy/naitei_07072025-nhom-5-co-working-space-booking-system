@@ -21,9 +21,12 @@ public class SecurityConfig {
 
     // Gom các route của renter
     public static final String[] RENTER_ROUTES = {
-            RENTER_VENUES,
-            RENTER_VENUES_SUB,
-            RENTER_VENUES_FILTER
+            RENTER_VENUES_SUB  // /api/venues/** 
+    };
+
+    // Gom các route của owner
+    public static final String[] OWNER_ROUTES = {
+            OWNER_VENUES
     };
 
     @Bean
@@ -47,13 +50,14 @@ public class SecurityConfig {
                                 AUTH_LOGOUT,
                                 AUTH_RECOVERY,
                                 AUTH_REGISTER_RENTER,
-                                AUTH_REGISTER_OWNER,
-                                OWNER_VENUES
+                                AUTH_REGISTER_OWNER
                         ).permitAll()
                         // Admin routes require ADMIN role
-                        .requestMatchers(ADMIN_BASE).hasRole("admin")
+                        .requestMatchers(ADMIN_BASE).hasRole("ADMIN")
                         // Renter routes require RENTER role
-                        .requestMatchers(RENTER_ROUTES).hasRole("renter")
+                        .requestMatchers(RENTER_ROUTES).hasRole("RENTER")
+                        // Owner routes require OWNER role
+                        .requestMatchers(OWNER_ROUTES).hasRole("OWNER")
                         // Tất cả request còn lại phải login
                         .anyRequest().authenticated()
                 )

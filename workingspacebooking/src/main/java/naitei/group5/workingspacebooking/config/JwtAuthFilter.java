@@ -7,8 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -18,7 +18,6 @@ import naitei.group5.workingspacebooking.service.TokenBlacklist;
 import naitei.group5.workingspacebooking.utils.JwtUtils;
 
 import java.io.IOException;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -27,9 +26,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtUtils jwt;
     private final TokenBlacklist blacklist;
     private final UserSessionRepository sessionRepo;
-
     @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+    protected void doFilterInternal(@NonNull HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain chain)
             throws ServletException, IOException {
 
         String header = req.getHeader(HttpHeaders.AUTHORIZATION);
