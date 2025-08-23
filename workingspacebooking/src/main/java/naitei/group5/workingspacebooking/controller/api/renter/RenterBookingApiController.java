@@ -20,14 +20,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/renter/bookings")
 @RequiredArgsConstructor
+
 public class RenterBookingApiController {
 
     private final BookingService bookingService;
     private final MessageSource messageSource;
 
-    /**
-     * API tạo booking mới
-     */
     @PostMapping
     public BookingResponse create(@RequestHeader("Authorization") String authHeader,
                                   @Valid @RequestBody BookingRequest req) {
@@ -35,12 +33,20 @@ public class RenterBookingApiController {
         return bookingService.createBooking(accessToken, req);
     }
 
+    @PutMapping("/{id}/cancel")
+    public BookingResponse cancel(@RequestHeader("Authorization") String authHeader,
+                                  @PathVariable Integer id) {
+        String accessToken = authHeader.replace("Bearer ", "");
+        return bookingService.cancelBooking(accessToken, id);
+    }
+
+
     /**
      * API xem lịch sử booking
      */
     @GetMapping("/history")
     public ResponseEntity<ApiResponse<List<BookingHistoryResponseDto>>> getBookingHistory() {
-        // 🔑 Lấy userId từ JWT (JwtAuthFilter đã set vào SecurityContext)
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails userDetails = (JwtUserDetails) auth.getPrincipal();
         Integer userId = userDetails.getId();

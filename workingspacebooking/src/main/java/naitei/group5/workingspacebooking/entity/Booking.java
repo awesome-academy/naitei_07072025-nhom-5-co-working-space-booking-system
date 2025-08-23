@@ -33,6 +33,9 @@ public class Booking {
 
     private LocalDateTime createdAt;
 
+    @Column(name = "canceled_at")
+    private LocalDateTime canceledAt;
+
     @Column(name = "total_amount", nullable = false, precision = 18, scale = 2)
     private BigDecimal totalAmount;
 

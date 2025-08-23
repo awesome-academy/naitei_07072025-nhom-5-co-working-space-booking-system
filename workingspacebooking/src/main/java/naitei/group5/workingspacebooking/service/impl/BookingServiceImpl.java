@@ -39,9 +39,6 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepo;
     private final JwtUtils jwtUtils;
 
-    /**
-     * API tạo booking
-     */
     @Override
     @Transactional
     public BookingResponse createBooking(String accessToken, BookingRequest req) {
@@ -135,6 +132,55 @@ public class BookingServiceImpl implements BookingService {
                 .build();
     }
 
+    @Override
+    @Transactional
+    public BookingResponse cancelBooking(String accessToken, Integer bookingId) {
+        // Lấy user từ token
+        var claims = jwtUtils.parse(accessToken).getBody();
+        String email = claims.getSubject();
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+
+        Booking booking = bookingRepo.findById(bookingId)
+                .orElseThrow(BookingNotFoundException::new);
+
+        // Kiểm tra quyền: booking phải thuộc về user
+        if (!booking.getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedActionException();
+        }
+
+        // Chỉ hủy khi status = booked
+        if (booking.getStatus() != BookingStatus.booked) {
+            throw new InvalidBookingStatusException();
+        }
+
+        // Cập nhật trạng thái và thời gian hủy
+        booking.setStatus(BookingStatus.canceled);
+        booking.setCanceledAt(LocalDateTime.now());
+        bookingRepo.save(booking);
+
+        // Lấy lại danh sách slot
+        List<BookingResponse.SlotResponse> slots = booking.getBookingDetails().stream()
+                .map(d -> BookingResponse.SlotResponse.builder()
+                        .startTime(d.getStartTime())
+                        .endTime(d.getEndTime())
+                        .price(BigDecimal.ZERO)
+                        .build())
+                .toList();
+
+        // Trả về response
+        return BookingResponse.builder()
+                .bookingId(booking.getId())
+                .userId(user.getId())
+                .venueId(booking.getVenue().getId())
+                .status(booking.getStatus().name())
+                .createdAt(booking.getCreatedAt())
+                .canceledAt(booking.getCanceledAt())
+                .totalPrice(BigDecimal.ZERO)
+                .slots(slots)
+                .build();
+    }
+
     /**
      * API xem lịch sử booking
      */
@@ -183,4 +229,5 @@ public class BookingServiceImpl implements BookingService {
             );
         }).toList();
     }
+
 }

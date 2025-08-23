@@ -21,6 +21,7 @@ public enum ErrorCode {
     BOOKING_CONFLICT(HttpStatus.CONFLICT, "Booking time conflict"),
     INVALID_BOOKING_STATUS(HttpStatus.BAD_REQUEST, "Invalid booking status"),
     INVALID_DURATION(HttpStatus.BAD_REQUEST, "Booking duration must be greater than 0"),
+    UNAUTHORIZED_ACTION(HttpStatus.FORBIDDEN, "You do not have permission to perform this action"),
 
     // PAYMENT
     PAYMENT_FAILED(HttpStatus.BAD_REQUEST, "Payment process failed"),

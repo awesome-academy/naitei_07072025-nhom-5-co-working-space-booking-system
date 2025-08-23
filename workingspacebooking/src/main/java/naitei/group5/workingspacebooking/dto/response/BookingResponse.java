@@ -16,6 +16,7 @@ public class BookingResponse {
     private String venueName;
     private String status;
     private LocalDateTime createdAt;
+    private LocalDateTime canceledAt;
     private BigDecimal totalPrice;
     private List<SlotResponse> slots;
 

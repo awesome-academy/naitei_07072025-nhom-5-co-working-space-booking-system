@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface BookingService {
     BookingResponse createBooking(String accessToken, BookingRequest req);
+    BookingResponse cancelBooking(String accessToken, Integer bookingId);
     List<BookingHistoryResponseDto> getBookingHistory(Integer userId);
 }
