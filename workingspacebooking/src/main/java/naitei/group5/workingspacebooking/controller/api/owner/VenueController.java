@@ -3,17 +3,20 @@ package naitei.group5.workingspacebooking.controller.api.owner;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import naitei.group5.workingspacebooking.config.JwtAuthFilter;
+import naitei.group5.workingspacebooking.config.JwtUserDetails;
 import naitei.group5.workingspacebooking.dto.request.CreateVenueRequestDto;
 import naitei.group5.workingspacebooking.dto.request.FilterVenueRequestDto;
 import naitei.group5.workingspacebooking.dto.response.VenueDetailResponseDto;
 import naitei.group5.workingspacebooking.dto.response.VenueResponseDto;
-import naitei.group5.workingspacebooking.entity.Venue;
+import naitei.group5.workingspacebooking.dto.response.VenueSoftDeleteResponseDto;
 import naitei.group5.workingspacebooking.service.VenueService;
 import naitei.group5.workingspacebooking.utils.ConverterDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated; 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.util.List;
 
@@ -58,5 +61,14 @@ public class VenueController {
     ) {
         var dto = venueService.getVenueDetailByOwner(ownerId, venueId);
         return ResponseEntity.ok(dto);
+    }
+
+    // DELETE /api/owner/venues/{venueId}?ownerId=123 (soft delete venue)
+    @DeleteMapping("/{venueId}")
+    public ResponseEntity<VenueSoftDeleteResponseDto> softDeleteVenue(
+            @PathVariable Integer venueId,
+            @AuthenticationPrincipal JwtUserDetails userDetails
+    ) {
+        return ResponseEntity.ok(venueService.softDeleteVenue(venueId, userDetails));
     }
 }

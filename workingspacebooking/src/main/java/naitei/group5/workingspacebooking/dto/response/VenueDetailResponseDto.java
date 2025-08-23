@@ -12,7 +12,7 @@ public record VenueDetailResponseDto(
         Boolean verified,
         String venueStyleName,
         List<PriceDto> prices,
-        List<BookingDto> bookings,
-        List<TimeSlotDto> availableSlots,
-        List<TimeSlotDto> busySlots
+        List<BookingResponseDto> bookings,
+        List<TimeSlotResponseDto> availableSlots,
+        List<TimeSlotResponseDto> busySlots
 ) {}

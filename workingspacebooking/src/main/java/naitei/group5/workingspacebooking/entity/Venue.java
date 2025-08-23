@@ -3,6 +3,7 @@ package naitei.group5.workingspacebooking.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -38,6 +39,12 @@ public class Venue {
 
     @Lob
     private String image;
+
+    @Column(nullable = false)
+    private Boolean deleted = Boolean.FALSE;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "venue", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Price> prices;

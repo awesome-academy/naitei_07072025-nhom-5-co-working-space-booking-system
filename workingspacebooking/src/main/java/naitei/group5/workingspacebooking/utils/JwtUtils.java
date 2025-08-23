@@ -22,21 +22,25 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 
-    public String generateAccessToken(String subjectEmail, String role, Integer sessionId) {
-        return baseBuilder(subjectEmail, role, sessionId, accessExpMs).compact();
+    public String generateAccessToken(String subjectEmail, String role, Integer sessionId, Integer userId) {
+        return baseBuilder(subjectEmail, role, sessionId, accessExpMs, userId).compact();
     }
 
-    public String generateRefreshToken(String subjectEmail, String role, Integer sessionId) {
-        return baseBuilder(subjectEmail, role, sessionId, refreshExpMs).compact();
+    public String generateRefreshToken(String subjectEmail, String role, Integer sessionId, Integer userId) {
+        return baseBuilder(subjectEmail, role, sessionId, refreshExpMs, userId).compact();
     }
 
-    private JwtBuilder baseBuilder(String email, String role, Integer sessionId, long ttl) {
+    private JwtBuilder baseBuilder(String email, String role, Integer sessionId, long ttl, Integer userId) {
         long now = System.currentTimeMillis();
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date(now))
                 .setExpiration(new Date(now + ttl))
-                .addClaims(Map.of("role", role, "sid", sessionId))
+                .addClaims(Map.of(
+                    "role", role, 
+                    "sid", sessionId,
+                    "userId", userId
+                    ))
                 .signWith(key(), SignatureAlgorithm.HS256);
     }
 

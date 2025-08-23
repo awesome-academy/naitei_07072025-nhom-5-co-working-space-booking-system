@@ -43,8 +43,8 @@ public class AuthServiceImpl implements AuthService {
         session.setIp(getClientIp(http));
         session = sessionRepo.save(session);
 
-        String access = jwt.generateAccessToken(user.getEmail(), user.getRole().name(), session.getId());
-        String refresh = jwt.generateRefreshToken(user.getEmail(), user.getRole().name(), session.getId());
+        String access = jwt.generateAccessToken(user.getEmail(), user.getRole().name(), session.getId(), user.getId());
+        String refresh = jwt.generateRefreshToken(user.getEmail(), user.getRole().name(), session.getId(), user.getId());
 
         return JwtResponse.builder()
                 .accessToken(access)
@@ -71,8 +71,8 @@ public class AuthServiceImpl implements AuthService {
         String role  = (String) claims.get("role");
         User user = userRepo.findByEmail(email).orElseThrow();
 
-        String newAccess  = jwt.generateAccessToken(email, role, sid);
-        String newRefresh = jwt.generateRefreshToken(email, role, sid);
+        String newAccess  = jwt.generateAccessToken(email, role, sid, user.getId());
+        String newRefresh = jwt.generateRefreshToken(email, role, sid, user.getId());
 
         return JwtResponse.builder()
                 .accessToken(newAccess)

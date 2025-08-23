@@ -23,6 +23,9 @@ import naitei.group5.workingspacebooking.service.VenueService;
 import naitei.group5.workingspacebooking.service.common.TimeSlotCalculator;
 import naitei.group5.workingspacebooking.specification.VenueSpecs;
 import naitei.group5.workingspacebooking.utils.ConverterDto;
+import naitei.group5.workingspacebooking.config.JwtUserDetails;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,6 +39,8 @@ public class VenueServiceImpl implements VenueService {
     private final VenueStyleRepository venueStyleRepository;
     private final UserRepository userRepository;
     private final BookingDetailRepository bookingDetailRepository;
+    private final MessageSource messageSource;
+
     private final TimeSlotCalculator timeSlotCalculator;
 
     // ==== Owner use cases ====
@@ -44,7 +49,7 @@ public class VenueServiceImpl implements VenueService {
         if (!userRepository.existsById(ownerId)) {
             throw new UserNotFoundException();
         }
-        return venueRepository.findByOwnerId(ownerId);
+        return venueRepository.findByOwnerIdAndDeletedFalse(ownerId);
     }
 
     @Override
@@ -99,7 +104,7 @@ public class VenueServiceImpl implements VenueService {
     // ==== Renter use cases ====
     @Override
     public List<VenueResponseDto> getVerifiedVenues() {
-        return venueRepository.findByVerified(true)
+        return venueRepository.findByVerifiedAndDeletedFalse(true)
                 .stream()
                 .map(ConverterDto::toVenueResponseDto)
                 .toList();
@@ -115,10 +120,11 @@ public class VenueServiceImpl implements VenueService {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end   = start.plusDays(7);
 
-        List<TimeSlotDto> busy = bookingDetailRepository
+        // Busy (CONFIRMED)
+        List<TimeSlotResponseDto> busy = bookingDetailRepository
                 .findBusySlotsByVenueAndTimeRange(venueId, start, end)
                 .stream()
-                .map(bd -> new TimeSlotDto(bd.getStartTime(), bd.getEndTime()))
+                .map(bd -> new TimeSlotResponseDto(bd.getStartTime(), bd.getEndTime()))
                 .toList();
 
         var mergedBusy     = timeSlotCalculator.mergeBusy(start, end, busy);
@@ -190,4 +196,36 @@ public class VenueServiceImpl implements VenueService {
         // 3. Trả về DTO riêng cho renter
         return ConverterDto.toVenueDetailRenterResponseDto(venue, busySlots);
     }
-}
+
+   @Override
+   @Transactional
+    public VenueSoftDeleteResponseDto softDeleteVenue(Integer venueId, JwtUserDetails userDetails) {
+        Integer ownerId = userDetails.getId();
+
+        // 1. Kiểm tra venue tồn tại và thuộc owner
+        Venue venue = venueRepository.findByIdAndOwnerIdWithAllDetails(venueId, ownerId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                         getMessage("venue.softdelete.notfound", venueId, ownerId)
+                ));
+
+        // 2. Cập nhật deleted flag + timestamp
+        int updated = venueRepository.softDeleteByIdAndOwnerId(venueId, ownerId);
+        if (updated == 0) {
+            throw new IllegalStateException("Venue does not exist or does not belong to this owner");
+        }
+
+        // 3. Trả về response
+        return new VenueSoftDeleteResponseDto(
+                venue.getId(),
+                venue.getName(),
+                true,
+                getMessage("venue.softdelete.success")
+        );
+    }
+    
+    private String getMessage(String key, Object... args) {
+        return messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
+    }
+
+}   
+
