@@ -3,7 +3,7 @@ package naitei.group5.workingspacebooking.controller.mvc.admin;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@PreAuthorize("hasRole('admin')")
+@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/admin")
 public abstract class BaseAdminController {
     // Base controller cho tất cả admin controllers
