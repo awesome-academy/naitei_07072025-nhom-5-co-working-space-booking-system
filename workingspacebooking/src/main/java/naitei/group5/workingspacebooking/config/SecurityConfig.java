@@ -21,7 +21,8 @@ public class SecurityConfig {
 
     // Gom các route của renter
     public static final String[] RENTER_ROUTES = {
-            RENTER_VENUES_SUB  // /api/venues/** 
+            RENTER_VENUES_SUB,
+            RENTER_PAYMENT
     };
 
     // Gom các route của owner
@@ -51,8 +52,7 @@ public class SecurityConfig {
                                 AUTH_RECOVERY,
                                 AUTH_REGISTER_RENTER,
                                 AUTH_REGISTER_OWNER,
-                                USER_ROLE,
-                                OWNER_VENUES
+                                VNPAY_RETURN
                         ).permitAll()
                         // Admin routes require ADMIN role
                         .requestMatchers(ADMIN_BASE).hasRole("ADMIN")
@@ -64,7 +64,6 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 }

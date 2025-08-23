@@ -6,6 +6,7 @@ import naitei.group5.workingspacebooking.entity.enums.BookingStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "bookings")
@@ -32,8 +33,8 @@ public class Booking {
 
     private LocalDateTime createdAt;
 
-    @Column(name = "total_amount", nullable = false)
-    private Double totalAmount;
+    @Column(name = "total_amount", nullable = false, precision = 18, scale = 2)
+    private BigDecimal totalAmount;
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookingDetail> bookingDetails;

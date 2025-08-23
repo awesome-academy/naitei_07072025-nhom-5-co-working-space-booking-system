@@ -29,3 +29,12 @@ spring.task.execution.pool.core-size=5
 spring.task.execution.pool.max-size=20
 spring.task.execution.pool.queue-capacity=100
 spring.task.execution.thread-name-prefix=EmailAsync-
+
+#VN pay
+vnpay.tmn-code=
+vnpay.hash-secret=
+vnpay.pay-url=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+vnpay.return-url=http://localhost:8080/api/payment/vnpay-return
+
+#Frontend
+frontend.url=YOUR_FRONTEND_URL

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Kết quả thanh toán</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body class="container mt-5">
+<div class="card shadow p-4 text-center">
+    <h2>Kết quả thanh toán</h2>
+    <p th:text="${resultMessage}"
+       th:classappend="${success} ? 'text-success fw-bold' : 'text-danger fw-bold'"></p>
+    <div class="mt-3">
+        <a href="/" class="btn btn-primary">Về trang chủ</a>
+    </div>
+</div>
+</body>
+</html>
