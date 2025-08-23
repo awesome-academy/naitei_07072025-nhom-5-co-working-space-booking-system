@@ -8,6 +8,8 @@ public class Endpoint {
 
     public static final String AUTH_REGISTER_RENTER = "/api/auth/register-renter";
     public static final String AUTH_REGISTER_OWNER  = "/api/auth/register-owner";
+    
+    public static final String USER_ROLE = "/api/users/**";
 
     public static final String OWNER_VENUES = "/api/owner/venues/**";
 

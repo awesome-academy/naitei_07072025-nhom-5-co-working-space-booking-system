@@ -1,20 +1,10 @@
 package naitei.group5.workingspacebooking.utils;
 
 import naitei.group5.workingspacebooking.dto.request.CreateVenueRequestDto;
-import naitei.group5.workingspacebooking.dto.response.PriceResponseDto;
-import naitei.group5.workingspacebooking.dto.response.BookingDetailResponseDto;
-import naitei.group5.workingspacebooking.dto.response.BookingResponseDto;
-import naitei.group5.workingspacebooking.dto.response.PriceDto;
-import naitei.group5.workingspacebooking.dto.response.TimeSlotResponseDto;
-import naitei.group5.workingspacebooking.dto.response.VenueDetailResponseDto;
-import naitei.group5.workingspacebooking.dto.response.VenueResponseDto;
 import naitei.group5.workingspacebooking.dto.request.UpdateVenueRequestDto;
 import naitei.group5.workingspacebooking.dto.response.*;
 import naitei.group5.workingspacebooking.entity.*;
 import naitei.group5.workingspacebooking.entity.enums.WeekDay;
-import naitei.group5.workingspacebooking.dto.response.VenueDetailRenterResponseDto;
-import naitei.group5.workingspacebooking.dto.response.BusySlotDto;
-
 
 import java.time.LocalTime;
 import java.util.*;
@@ -219,5 +209,17 @@ public final class ConverterDto {
     if (venueStyle != null) {
         venue.setVenueStyle(venueStyle);
     }
+    }
+
+     public static UserResponse toUserResponse(User user) {
+        if (user == null) return null;
+
+        return UserResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .role(user.getRole())
+                .build();
     }
 }
