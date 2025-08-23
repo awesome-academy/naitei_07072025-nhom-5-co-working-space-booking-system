@@ -32,6 +32,9 @@ public class Booking {
 
     private LocalDateTime createdAt;
 
+    @Column(name = "total_amount", nullable = false)
+    private Double totalAmount;
+
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookingDetail> bookingDetails;
 
