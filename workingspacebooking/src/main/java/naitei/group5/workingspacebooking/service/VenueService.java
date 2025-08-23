@@ -3,6 +3,7 @@ package naitei.group5.workingspacebooking.service;
 import naitei.group5.workingspacebooking.dto.request.CreateVenueRequestDto;
 import naitei.group5.workingspacebooking.dto.request.FilterVenueRenterRequestDto;
 import naitei.group5.workingspacebooking.dto.request.FilterVenueRequestDto;
+import naitei.group5.workingspacebooking.dto.response.VenueDetailRenterResponseDto;
 import naitei.group5.workingspacebooking.dto.response.VenueDetailResponseDto;
 import naitei.group5.workingspacebooking.dto.response.VenueResponseDto;
 import naitei.group5.workingspacebooking.entity.Venue;
@@ -25,5 +26,7 @@ public interface VenueService {
     List<VenueResponseDto> getVerifiedVenues();
 
     List<VenueResponseDto> filterVenuesForRenter(FilterVenueRenterRequestDto req);
+
+    VenueDetailRenterResponseDto getVenueDetail(Integer venueId);
 
 }

@@ -19,6 +19,13 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
 
+    // Gom các route của renter
+    public static final String[] RENTER_ROUTES = {
+            RENTER_VENUES,
+            RENTER_VENUES_SUB,
+            RENTER_VENUES_FILTER
+    };
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -46,10 +53,12 @@ public class SecurityConfig {
                         // Admin routes require ADMIN role
                         .requestMatchers(ADMIN_BASE).hasRole("admin")
                         // Renter routes require RENTER role
-                        .requestMatchers(RENTER_VENUES, RENTER_VENUES_SUB, RENTER_VENUES_FILTER).hasRole("renter")
+                        .requestMatchers(RENTER_ROUTES).hasRole("renter")
+                        // Tất cả request còn lại phải login
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }

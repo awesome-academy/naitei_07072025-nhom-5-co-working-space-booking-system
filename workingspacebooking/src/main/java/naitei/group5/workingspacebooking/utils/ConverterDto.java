@@ -70,19 +70,17 @@ public final class ConverterDto {
         boolean validTimeRange = (filterStart != null && filterEnd != null && !filterStart.isAfter(filterEnd));
 
         List<PriceResponseDto> filteredPrices = (v.getPrices() == null)
-                ? Collections.emptyList()  // tránh null
+                ? Collections.emptyList()
                 : v.getPrices().stream()
                 .filter(p -> {
-                    // check ngày
                     boolean dayOk = (daySet == null) || daySet.contains(p.getDayOfWeek());
 
-                    // check giờ
                     boolean timeOk = true;
                     if (validTimeRange) {
+                        // price phải bao ngoài khoảng yêu cầu
                         timeOk = !p.getTimeStart().isAfter(filterStart)
                                 && !p.getTimeEnd().isBefore(filterEnd);
                     }
-
                     return dayOk && timeOk;
                 })
                 .map(ConverterDto::toPriceResponseDto)
@@ -96,12 +94,11 @@ public final class ConverterDto {
                 v.getLocation(),
                 v.getVerified(),
                 v.getImage(),
-                filteredPrices,   // luôn list, không null
+                filteredPrices,
                 styleId,
                 styleName
         );
     }
-
 
     public static VenueDetailResponseDto toVenueDetailResponseDto(
             Venue v,
@@ -120,6 +117,30 @@ public final class ConverterDto {
                 v.getPrices() != null ? v.getPrices().stream().map(ConverterDto::toPriceDto).toList() : List.of(),
                 v.getBookings() != null ? v.getBookings().stream().map(ConverterDto::toBookingDto).toList() : List.of(),
                 availableSlots,
+                busySlots
+        );
+    }
+
+    // renter venue detail
+    public static VenueDetailRenterResponseDto toVenueDetailRenterResponseDto(
+            Venue v,
+            List<BusySlotDto> busySlots
+    ) {
+        List<PriceResponseDto> prices =
+                (v.getPrices() != null)
+                        ? v.getPrices().stream().map(ConverterDto::toPriceResponseDto).toList()
+                        : List.of();
+
+        return new VenueDetailRenterResponseDto(
+                v.getId(),
+                v.getName(),
+                v.getDescription(),
+                v.getCapacity(),
+                v.getLocation(),
+                v.getVerified(),
+                v.getImage(),
+                v.getVenueStyle() != null ? v.getVenueStyle().getName() : null,
+                prices,
                 busySlots
         );
     }

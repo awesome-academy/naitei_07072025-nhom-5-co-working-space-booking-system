@@ -3,6 +3,7 @@ package naitei.group5.workingspacebooking.controller.api.renter;
 import lombok.RequiredArgsConstructor;
 import naitei.group5.workingspacebooking.dto.request.FilterVenueRenterRequestDto;
 import naitei.group5.workingspacebooking.dto.response.ApiResponse;
+import naitei.group5.workingspacebooking.dto.response.VenueDetailRenterResponseDto;
 import naitei.group5.workingspacebooking.dto.response.VenueResponseDto;
 import naitei.group5.workingspacebooking.service.VenueService;
 import org.springframework.context.MessageSource;
@@ -31,5 +32,12 @@ public class RenterVenueApiController {
         List<VenueResponseDto> venues = venueService.filterVenuesForRenter(req);
         String message = messageSource.getMessage("venue.list.filtered", null, LocaleContextHolder.getLocale());
         return ResponseEntity.ok(ApiResponse.success(message, venues));
+    }
+
+    @GetMapping("/{venueId}")
+    public ResponseEntity<ApiResponse<VenueDetailRenterResponseDto>> getVenueDetail(@PathVariable Integer venueId) {
+        var detail = venueService.getVenueDetail(venueId);
+        String message = messageSource.getMessage("venue.detail.success", null, LocaleContextHolder.getLocale());
+        return ResponseEntity.ok(ApiResponse.success(message, detail));
     }
 }

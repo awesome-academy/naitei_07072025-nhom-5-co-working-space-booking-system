@@ -2,15 +2,12 @@ package naitei.group5.workingspacebooking.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import naitei.group5.workingspacebooking.dto.request.FilterVenueRenterRequestDto;
+import naitei.group5.workingspacebooking.dto.response.*;
 import naitei.group5.workingspacebooking.specification.RenterVenueSpecs;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import naitei.group5.workingspacebooking.dto.request.CreateVenueRequestDto;
 import naitei.group5.workingspacebooking.dto.request.FilterVenueRequestDto;
-import naitei.group5.workingspacebooking.dto.response.TimeSlotDto;
-import naitei.group5.workingspacebooking.dto.response.VenueDetailResponseDto;
-import naitei.group5.workingspacebooking.dto.response.VenueResponseDto;
 import naitei.group5.workingspacebooking.entity.User;
 import naitei.group5.workingspacebooking.entity.Venue;
 import naitei.group5.workingspacebooking.entity.VenueStyle;
@@ -28,7 +25,6 @@ import naitei.group5.workingspacebooking.specification.VenueSpecs;
 import naitei.group5.workingspacebooking.utils.ConverterDto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -158,6 +154,7 @@ public class VenueServiceImpl implements VenueService {
 
         List<Venue> venues = venueRepository.findAll(spec);
 
+        // Trả về chỉ các price khớp time/weekDays
         return venues.stream()
                 .map(v -> ConverterDto.toVenueResponseDto(
                         v,
@@ -166,5 +163,31 @@ public class VenueServiceImpl implements VenueService {
                         req.weekDays()
                 ))
                 .toList();
+    }
+
+    @Override
+    public VenueDetailRenterResponseDto getVenueDetail(Integer venueId) {
+        Venue venue = venueRepository.findById(venueId)
+                .orElseThrow(VenueNotFoundException::new);
+
+        // 1. Lấy tất cả prices của venue
+        var prices = venue.getPrices().stream()
+                .map(ConverterDto::toPriceResponseDto)
+                .toList();
+
+        // 2. Lấy tất cả booking detail (booked hoặc pending)
+        var busySlots = bookingDetailRepository.findByVenueId(venueId)
+                .stream()
+                .filter(b -> b.getBooking().getStatus().name().equalsIgnoreCase("BOOKED")
+                        || b.getBooking().getStatus().name().equalsIgnoreCase("PENDING"))
+                .map(b -> new BusySlotDto(
+                        b.getStartTime(),
+                        b.getEndTime(),
+                        b.getBooking().getStatus().name()
+                ))
+                .toList();
+
+        // 3. Trả về DTO riêng cho renter
+        return ConverterDto.toVenueDetailRenterResponseDto(venue, busySlots);
     }
 }

@@ -12,7 +12,9 @@ import java.util.List;
 @Repository
 public interface BookingDetailRepository extends JpaRepository<BookingDetail, Integer> {
 
-    // Method
+    /**
+     * Tìm các slot đã được đặt (busy slots) trong khoảng thời gian cụ thể của một venue.
+     */
     @Query("""
         select bd
         from BookingDetail bd
@@ -26,11 +28,27 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, In
     List<BookingDetail> findBusySlotsByVenueAndTimeRange(
             @Param("venueId") Integer venueId,
             @Param("start") LocalDateTime start,
-            @Param("end")   LocalDateTime end
+            @Param("end") LocalDateTime end
     );
 
-    // Method lọc khoảng startTime
+    /**
+     * Lọc các BookingDetail theo khoảng startTime.
+     */
     List<BookingDetail> findByBooking_Venue_IdAndStartTimeBetween(
-            Integer venueId, LocalDateTime start, LocalDateTime end
+            Integer venueId,
+            LocalDateTime start,
+            LocalDateTime end
     );
+
+    /**
+     * Lấy toàn bộ BookingDetail của một venue (fetch join để tránh N+1).
+     */
+    @Query("""
+        select bd
+        from BookingDetail bd
+             join fetch bd.booking b
+             join fetch b.venue v
+        where v.id = :venueId
+    """)
+    List<BookingDetail> findByVenueId(@Param("venueId") Integer venueId);
 }
