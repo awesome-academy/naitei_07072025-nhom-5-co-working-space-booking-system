@@ -7,6 +7,7 @@ import naitei.group5.workingspacebooking.config.JwtAuthFilter;
 import naitei.group5.workingspacebooking.config.JwtUserDetails;
 import naitei.group5.workingspacebooking.dto.request.CreateVenueRequestDto;
 import naitei.group5.workingspacebooking.dto.request.FilterVenueRequestDto;
+import naitei.group5.workingspacebooking.dto.request.UpdateVenueRequestDto;
 import naitei.group5.workingspacebooking.dto.response.VenueDetailResponseDto;
 import naitei.group5.workingspacebooking.dto.response.VenueResponseDto;
 import naitei.group5.workingspacebooking.dto.response.VenueSoftDeleteResponseDto;
@@ -70,5 +71,16 @@ public class VenueController {
             @AuthenticationPrincipal JwtUserDetails userDetails
     ) {
         return ResponseEntity.ok(venueService.softDeleteVenue(venueId, userDetails));
+    }
+    // PUT /api/owner/venues/{venueId} (owner update venue)
+    @PutMapping("/{venueId}")
+    public ResponseEntity<VenueResponseDto> updateVenue(
+            @PathVariable Integer venueId,
+            @AuthenticationPrincipal JwtUserDetails userDetails,
+            @Valid @RequestBody UpdateVenueRequestDto requestDto
+    ) {
+        Integer ownerId = userDetails.getId(); // lấy ownerId từ JWT
+        VenueResponseDto responseDto = venueService.updateVenue(ownerId, venueId, requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 }
