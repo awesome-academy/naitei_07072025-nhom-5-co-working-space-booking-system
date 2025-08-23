@@ -8,6 +8,8 @@ import naitei.group5.workingspacebooking.dto.response.PriceDto;
 import naitei.group5.workingspacebooking.dto.response.TimeSlotResponseDto;
 import naitei.group5.workingspacebooking.dto.response.VenueDetailResponseDto;
 import naitei.group5.workingspacebooking.dto.response.VenueResponseDto;
+import naitei.group5.workingspacebooking.dto.request.UpdateVenueRequestDto;
+import naitei.group5.workingspacebooking.dto.response.*;
 import naitei.group5.workingspacebooking.entity.*;
 import naitei.group5.workingspacebooking.entity.enums.WeekDay;
 import naitei.group5.workingspacebooking.dto.response.VenueDetailRenterResponseDto;
@@ -206,5 +208,16 @@ public final class ConverterDto {
 
     private ConverterDto() {
         throw new UnsupportedOperationException("Utility class không thể được khởi tạo");
+    }
+
+    public static void updateVenueFromDto(Venue venue, UpdateVenueRequestDto req, VenueStyle venueStyle) {
+    venue.setName(req.getName());
+    venue.setDescription(req.getDescription());
+    venue.setCapacity(req.getCapacity());
+    venue.setLocation(req.getLocation());
+    venue.setImage(req.getImage());
+    if (venueStyle != null) {
+        venue.setVenueStyle(venueStyle);
+    }
     }
 }

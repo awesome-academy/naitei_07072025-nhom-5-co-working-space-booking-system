@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import naitei.group5.workingspacebooking.dto.request.CreateVenueRequestDto;
 import naitei.group5.workingspacebooking.dto.request.FilterVenueRequestDto;
+import naitei.group5.workingspacebooking.dto.request.UpdateVenueRequestDto;
 import naitei.group5.workingspacebooking.entity.User;
 import naitei.group5.workingspacebooking.entity.Venue;
 import naitei.group5.workingspacebooking.entity.VenueStyle;
@@ -172,6 +173,22 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
+    @Transactional
+    public VenueResponseDto updateVenue(Integer ownerId, Integer venueId, UpdateVenueRequestDto request) {
+
+        Venue venue = venueRepository.findByIdAndOwnerIdWithAllDetails(venueId, ownerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Venue not found or not owned by you"));
+
+        VenueStyle venueStyle = venueStyleRepository.findById(request.getVenueStyleId())
+                .orElseThrow(() -> new ResourceNotFoundException("Venue style not found"));
+
+        ConverterDto.updateVenueFromDto(venue, request, venueStyle);
+
+        Venue updated = venueRepository.save(venue);
+
+        return ConverterDto.toVenueResponseDto(updated);
+    }
+
     public VenueDetailRenterResponseDto getVenueDetail(Integer venueId) {
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(VenueNotFoundException::new);
@@ -226,6 +243,5 @@ public class VenueServiceImpl implements VenueService {
     private String getMessage(String key, Object... args) {
         return messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
     }
-
-}   
-
+    
+}
