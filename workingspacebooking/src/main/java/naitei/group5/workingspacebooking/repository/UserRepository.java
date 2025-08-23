@@ -2,6 +2,9 @@ package naitei.group5.workingspacebooking.repository;
 
 import naitei.group5.workingspacebooking.entity.enums.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import naitei.group5.workingspacebooking.entity.User;
 
 import java.util.Collection;
@@ -17,4 +20,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findById(Integer id);
     
     List<User> findAllByRoleIn(Collection<UserRole> roles);
+    
 }

@@ -9,16 +9,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import naitei.group5.workingspacebooking.config.JwtUserDetails;
+
+
 import naitei.group5.workingspacebooking.dto.request.RegisterRequest;
+import naitei.group5.workingspacebooking.dto.request.UpdateUserProfileRequestDto;
 import naitei.group5.workingspacebooking.dto.response.RegisterResponse;
+import naitei.group5.workingspacebooking.dto.response.UpdateUserProfileResponseDto;
 import naitei.group5.workingspacebooking.dto.response.UserResponse;
 import naitei.group5.workingspacebooking.entity.User;
 import naitei.group5.workingspacebooking.repository.UserRepository;
 import naitei.group5.workingspacebooking.service.EmailService;
 import naitei.group5.workingspacebooking.service.UserService;
-import java.security.SecureRandom;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -88,7 +92,27 @@ public class UserServiceImpl implements UserService {
         return ConverterDto.toUserResponse(user);
     }
 
-	private String getMessage(String key, Object... args) {
+	@Override
+    @Transactional
+    public UpdateUserProfileResponseDto updateUserProfile(JwtUserDetails userDetails,
+                                                          UpdateUserProfileRequestDto requestDto) {
+        Integer userId = userDetails.getId();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        getMessage("user.profile.update.notfound", userId)
+                ));
+
+        // update trực tiếp entity
+        user.setName(requestDto.getName());
+        user.setPhone(requestDto.getPhone());
+
+        userRepository.save(user);
+
+        return ConverterDto.toUpdateUserProfileResponseDto(user);
+    }
+
+    private String getMessage(String key, Object... args) {
         return messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
     }
 }
