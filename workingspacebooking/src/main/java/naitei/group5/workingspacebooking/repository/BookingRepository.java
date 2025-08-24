@@ -7,6 +7,10 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
     // Lấy danh sách booking theo userId
     List<Booking> findByUser_IdOrderByCreatedAtDesc(Integer userId);
+
     // lấy danh sách booking theo owner
     List<Booking> findByVenue_Owner_IdOrderByCreatedAtDesc(Integer ownerId);
+
+    // filter theo venueName + owner
+    List<Booking> findByVenue_NameContainingIgnoreCaseAndVenue_Owner_IdOrderByCreatedAtDesc(String venueName, Integer ownerId);
 }

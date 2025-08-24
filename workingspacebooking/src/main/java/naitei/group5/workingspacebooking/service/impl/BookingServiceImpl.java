@@ -193,9 +193,6 @@ public class BookingServiceImpl implements BookingService {
         return bookings.stream().map(this::mapToDto).toList();
     }
 
-    /**
-     * API xem lịch sử booking của owner (các venue mình sở hữu)
-     */
     @Override
     public List<BookingHistoryResponseDto> getBookingsByOwner(Integer ownerId) {
         if (!userRepo.existsById(ownerId)) {
@@ -203,6 +200,16 @@ public class BookingServiceImpl implements BookingService {
         }
 
         List<Booking> bookings = bookingRepo.findByVenue_Owner_IdOrderByCreatedAtDesc(ownerId);
+        return bookings.stream().map(this::mapToDto).toList();
+    }
+
+    @Override
+    public List<BookingHistoryResponseDto> getBookingsByOwnerAndVenueName(Integer ownerId, String venueName) {
+        if (!userRepo.existsById(ownerId)) {
+            throw new UserNotFoundException();
+        }
+
+        List<Booking> bookings = bookingRepo.findByVenue_NameContainingIgnoreCaseAndVenue_Owner_IdOrderByCreatedAtDesc(venueName, ownerId);
         return bookings.stream().map(this::mapToDto).toList();
     }
 
@@ -221,15 +228,16 @@ public class BookingServiceImpl implements BookingService {
 
         // map payment (chỉ khi booked hoặc completed)
         PaymentResponseDto paymentDto = null;
-        if ("booked".equalsIgnoreCase(b.getStatus().name()) ||
-                "completed".equalsIgnoreCase(b.getStatus().name())) {
+        if (BookingStatus.booked.name().equalsIgnoreCase(b.getStatus().name()) ||
+                BookingStatus.completed.name().equalsIgnoreCase(b.getStatus().name())) {
+
             var payment = b.getPayments().stream().findFirst().orElse(null);
             if (payment != null) {
                 paymentDto = new PaymentResponseDto(
                         payment.getAmount(),
                         payment.getMethod(),
                         payment.getPaidTime(),
-                        payment.getStatus()
+                        payment.getStatus()   // giữ enum PaymentStatus
                 );
             }
         }

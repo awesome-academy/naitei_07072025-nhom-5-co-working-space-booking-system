@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,13 +24,20 @@ public class OwnerBookingApiController {
     private final BookingService bookingService;
     private final MessageSource messageSource;
 
-    // Xem tất cả booking tại các venue mà Owner sở hữu
+    // Xem tất cả booking tại các venue mà Owner sở hữu, có thể filter theo venueName
     @GetMapping
     public ResponseEntity<ApiResponse<List<BookingHistoryResponseDto>>> getBookingsAtMyVenues(
-            @AuthenticationPrincipal JwtUserDetails userDetails) {
-
+            @AuthenticationPrincipal JwtUserDetails userDetails,
+            @RequestParam(required = false) String venueName
+    ) {
         Integer ownerId = userDetails.getId();
-        List<BookingHistoryResponseDto> bookings = bookingService.getBookingsByOwner(ownerId);
+
+        List<BookingHistoryResponseDto> bookings;
+        if (venueName != null && !venueName.isBlank()) {
+            bookings = bookingService.getBookingsByOwnerAndVenueName(ownerId, venueName);
+        } else {
+            bookings = bookingService.getBookingsByOwner(ownerId);
+        }
 
         String message = messageSource.getMessage(
                 "owner.bookings.success", null, LocaleContextHolder.getLocale()

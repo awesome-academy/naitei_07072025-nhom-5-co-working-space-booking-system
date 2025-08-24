@@ -9,7 +9,12 @@ import java.util.List;
 public interface BookingService {
     BookingResponse createBooking(String accessToken, BookingRequest req);
     BookingResponse cancelBooking(String accessToken, Integer bookingId);
+
     List<BookingHistoryResponseDto> getBookingHistory(Integer userId);
-    //owner role
+
+    // owner role
     List<BookingHistoryResponseDto> getBookingsByOwner(Integer ownerId);
+
+    // filter theo venueName
+    List<BookingHistoryResponseDto> getBookingsByOwnerAndVenueName(Integer ownerId, String venueName);
 }

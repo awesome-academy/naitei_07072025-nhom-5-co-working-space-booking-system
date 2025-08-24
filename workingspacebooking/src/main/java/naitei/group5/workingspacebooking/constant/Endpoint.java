@@ -22,14 +22,17 @@ public class Endpoint {
     public static final String RENTER_VENUES = "/api/venues";
     public static final String RENTER_VENUES_SUB = "/api/venues/**";
     public static final String RENTER_VENUES_FILTER = "/api/venues/filter";
+
     // renter - bookings
     public static final String RENTER_BOOKINGS = "/api/renter/bookings";
     public static final String RENTER_BOOKINGS_HISTORY = "/api/renter/bookings/history";
 
     // renter - payment
     public static final String RENTER_PAYMENT = "/api/payment/**";
-    //owner-bookings
+
+    // owner - bookings
     public static final String OWNER_BOOKINGS = "/api/owner/bookings";
-    //admin
+
+    // admin
     public static final String ADMIN_BASE = "/admin/**";
 }
