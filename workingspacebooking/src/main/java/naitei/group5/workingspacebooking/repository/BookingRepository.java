@@ -6,4 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface BookingRepository extends JpaRepository<Booking, Integer> {}
+public interface BookingRepository extends JpaRepository<Booking, Integer> {
+    // Lấy danh sách booking theo userId
+    List<Booking> findByUser_IdOrderByCreatedAtDesc(Integer userId);
+}
