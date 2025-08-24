@@ -73,7 +73,7 @@ public class BookingServiceImpl implements BookingService {
                 .map(slot -> processSlot(venue, savedBooking, slot))
                 .collect(Collectors.toList());
 
-        // Tính tổng tiền (dùng BigDecimal trực tiếp)
+        // Tính tổng tiền
         BigDecimal totalPrice = slots.stream()
                 .map(BookingResponse.SlotResponse::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -119,7 +119,6 @@ public class BookingServiceImpl implements BookingService {
             throw new InvalidDurationException();
         }
 
-
         BigDecimal slotPrice = priceRule.getPrice().multiply(BigDecimal.valueOf(hours));
 
         BookingDetail detail = new BookingDetail();
@@ -136,7 +135,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     /**
-     * API xem lịch sử booking
+     * API xem lịch sử booking của renter
      */
     @Override
     public List<BookingHistoryResponseDto> getBookingHistory(Integer userId) {
@@ -145,42 +144,58 @@ public class BookingServiceImpl implements BookingService {
         }
 
         List<Booking> bookings = bookingRepo.findByUser_IdOrderByCreatedAtDesc(userId);
+        return bookings.stream().map(this::mapToDto).toList();
+    }
 
-        return bookings.stream().map(b -> {
-            // map booking details
-            var details = b.getBookingDetails().stream()
-                    .map(d -> new BookingDetailResponseDto(
-                            d.getId(),
-                            d.getStartTime(),
-                            d.getEndTime()
-                    ))
-                    .toList();
+    /**
+     * API xem lịch sử booking của owner (các venue mình sở hữu)
+     */
+    @Override
+    public List<BookingHistoryResponseDto> getBookingsByOwner(Integer ownerId) {
+        if (!userRepo.existsById(ownerId)) {
+            throw new UserNotFoundException();
+        }
 
-            // map payment (chỉ khi booked hoặc completed)
-            PaymentResponseDto paymentDto = null;
-            if ("booked".equalsIgnoreCase(b.getStatus().name()) ||
-                    "completed".equalsIgnoreCase(b.getStatus().name())) {
+        List<Booking> bookings = bookingRepo.findByVenue_Owner_IdOrderByCreatedAtDesc(ownerId);
+        return bookings.stream().map(this::mapToDto).toList();
+    }
 
-                var payment = b.getPayments().stream().findFirst().orElse(null);
-                if (payment != null) {
-                    paymentDto = new PaymentResponseDto(
-                            payment.getAmount(),
-                            payment.getMethod(),
-                            payment.getPaidTime(),
-                            payment.getStatus()
-                    );
-                }
+    /**
+     * Map entity Booking sang DTO
+     */
+    private BookingHistoryResponseDto mapToDto(Booking b) {
+        // map booking details
+        var details = b.getBookingDetails().stream()
+                .map(d -> new BookingDetailResponseDto(
+                        d.getId(),
+                        d.getStartTime(),
+                        d.getEndTime()
+                ))
+                .toList();
+
+        // map payment (chỉ khi booked hoặc completed)
+        PaymentResponseDto paymentDto = null;
+        if ("booked".equalsIgnoreCase(b.getStatus().name()) ||
+                "completed".equalsIgnoreCase(b.getStatus().name())) {
+            var payment = b.getPayments().stream().findFirst().orElse(null);
+            if (payment != null) {
+                paymentDto = new PaymentResponseDto(
+                        payment.getAmount(),
+                        payment.getMethod(),
+                        payment.getPaidTime(),
+                        payment.getStatus()
+                );
             }
+        }
 
-            return new BookingHistoryResponseDto(
-                    b.getId(),
-                    b.getVenue().getName(),
-                    b.getVenue().getLocation(),
-                    b.getStatus().name(),
-                    b.getCreatedAt(),
-                    details,
-                    paymentDto
-            );
-        }).toList();
+        return new BookingHistoryResponseDto(
+                b.getId(),
+                b.getVenue().getName(),
+                b.getVenue().getLocation(),
+                b.getStatus().name(),
+                b.getCreatedAt(),
+                details,
+                paymentDto
+        );
     }
 }
