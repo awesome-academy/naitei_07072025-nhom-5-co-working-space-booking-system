@@ -19,4 +19,12 @@ public class RenterBookingApiController {
         String accessToken = authHeader.replace("Bearer ", "");
         return bookingService.createBooking(accessToken, req);
     }
+
+    @PutMapping("/{id}/cancel")
+    public BookingResponse cancel(@RequestHeader("Authorization") String authHeader,
+                                  @PathVariable Integer id) {
+        String accessToken = authHeader.replace("Bearer ", "");
+        return bookingService.cancelBooking(accessToken, id);
+    }
+
 }

@@ -5,4 +5,5 @@ import naitei.group5.workingspacebooking.dto.response.BookingResponse;
 
 public interface BookingService {
     BookingResponse createBooking(String accessToken, BookingRequest req);
+    BookingResponse cancelBooking(String accessToken, Integer bookingId);
 }
