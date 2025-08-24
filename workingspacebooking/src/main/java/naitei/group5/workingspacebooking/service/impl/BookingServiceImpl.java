@@ -1,9 +1,11 @@
 package naitei.group5.workingspacebooking.service.impl;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import naitei.group5.workingspacebooking.dto.request.BookingRequest;
 import naitei.group5.workingspacebooking.dto.response.BookingResponse;
+import naitei.group5.workingspacebooking.dto.response.BookingDetailResponseDto;
+import naitei.group5.workingspacebooking.dto.response.BookingHistoryResponseDto;
+import naitei.group5.workingspacebooking.dto.response.PaymentResponseDto;
 import naitei.group5.workingspacebooking.entity.Booking;
 import naitei.group5.workingspacebooking.entity.BookingDetail;
 import naitei.group5.workingspacebooking.entity.User;
@@ -18,6 +20,7 @@ import naitei.group5.workingspacebooking.repository.VenueRepository;
 import naitei.group5.workingspacebooking.service.BookingService;
 import naitei.group5.workingspacebooking.utils.JwtUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -35,6 +38,9 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepo;
     private final JwtUtils jwtUtils;
 
+    /**
+     * API tạo booking
+     */
     @Override
     @Transactional
     public BookingResponse createBooking(String accessToken, BookingRequest req) {
@@ -126,5 +132,55 @@ public class BookingServiceImpl implements BookingService {
                 .endTime(slot.getEndTime())
                 .price(slotPrice)
                 .build();
+    }
+
+    /**
+     * API xem lịch sử booking
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookingHistoryResponseDto> getBookingHistory(Integer userId) {
+        if (!userRepo.existsById(userId)) {
+            throw new UserNotFoundException();
+        }
+
+        List<Booking> bookings = bookingRepo.findByUser_IdOrderByCreatedAtDesc(userId);
+
+        return bookings.stream().map(b -> {
+            // map booking details
+            var details = b.getBookingDetails().stream()
+                    .map(d -> new BookingDetailResponseDto(
+                            d.getId(),
+                            d.getStartTime(),
+                            d.getEndTime()
+                    ))
+                    .toList();
+
+            // map payment (chỉ khi booked hoặc completed)
+            PaymentResponseDto paymentDto = null;
+            if ("booked".equalsIgnoreCase(b.getStatus().name()) ||
+                    "completed".equalsIgnoreCase(b.getStatus().name())) {
+
+                var payment = b.getPayments().stream().findFirst().orElse(null);
+                if (payment != null) {
+                    paymentDto = new PaymentResponseDto(
+                            payment.getAmount(),
+                            payment.getMethod(),
+                            payment.getPaidTime(),
+                            payment.getStatus()
+                    );
+                }
+            }
+
+            return new BookingHistoryResponseDto(
+                    b.getId(),
+                    b.getVenue().getName(),
+                    b.getVenue().getLocation(),
+                    b.getStatus().name(),
+                    b.getCreatedAt(),
+                    details,
+                    paymentDto
+            );
+        }).toList();
     }
 }
