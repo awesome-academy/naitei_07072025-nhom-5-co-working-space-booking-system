@@ -31,13 +31,7 @@ public class OwnerBookingApiController {
             @RequestParam(required = false) String venueName
     ) {
         Integer ownerId = userDetails.getId();
-
-        List<BookingHistoryResponseDto> bookings;
-        if (venueName != null && !venueName.isBlank()) {
-            bookings = bookingService.getBookingsByOwnerAndVenueName(ownerId, venueName);
-        } else {
-            bookings = bookingService.getBookingsByOwner(ownerId);
-        }
+        List<BookingHistoryResponseDto> bookings = bookingService.getBookingsForOwner(ownerId, venueName);
 
         String message = messageSource.getMessage(
                 "owner.bookings.success", null, LocaleContextHolder.getLocale()

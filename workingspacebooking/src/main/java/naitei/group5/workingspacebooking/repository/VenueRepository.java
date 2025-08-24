@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface VenueRepository extends JpaRepository<Venue, Integer>, JpaSpecificationExecutor<Venue> {
 
-    // Tìm venue theo id, load kèm owner + venueStyle (tránh N+1) → bỏ venue deleted
+    // Tìm venue theo id, load kèm owner + venueStyle → bỏ delete
     @Query("""
             SELECT v 
             FROM Venue v 
@@ -27,12 +27,12 @@ public interface VenueRepository extends JpaRepository<Venue, Integer>, JpaSpeci
             """)
     Optional<Venue> findByIdWithDetails(@Param("id") Integer id);
 
-    // Tìm tất cả venue của 1 owner, load kèm venueStyle → bỏ venue deleted
+    // Tìm tất cả venue của 1 owner → bỏ deleted
     @EntityGraph(attributePaths = {"venueStyle"})
     List<Venue> findByOwnerIdAndDeletedFalse(Integer ownerId);
 
-    // Tìm tất cả venue đã verified → bỏ venue deleted
-    List<Venue> findByVerifiedAndDeletedFalse(Boolean verified);
+    // Tìm tất cả venue đã verified → bỏ venue đã soft delete
+    List<Venue> findByVerifiedTrueAndDeletedAtIsNull();
 
     // Xem cụ thể venue của 1 owner → bỏ venue deleted
     @Query("""
@@ -59,4 +59,3 @@ public interface VenueRepository extends JpaRepository<Venue, Integer>, JpaSpeci
                                  @Param("ownerId") Integer ownerId);
 
 }
-

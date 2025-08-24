@@ -12,9 +12,6 @@ public interface BookingService {
 
     List<BookingHistoryResponseDto> getBookingHistory(Integer userId);
 
-    // owner role
-    List<BookingHistoryResponseDto> getBookingsByOwner(Integer ownerId);
-
-    // filter theo venueName
-    List<BookingHistoryResponseDto> getBookingsByOwnerAndVenueName(Integer ownerId, String venueName);
+    //owner
+    List<BookingHistoryResponseDto> getBookingsForOwner(Integer ownerId, String venueName);
 }
