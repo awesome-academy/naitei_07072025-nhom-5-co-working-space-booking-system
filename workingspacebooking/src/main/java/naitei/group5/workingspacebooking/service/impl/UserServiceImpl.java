@@ -16,7 +16,6 @@ import naitei.group5.workingspacebooking.entity.User;
 import naitei.group5.workingspacebooking.repository.UserRepository;
 import naitei.group5.workingspacebooking.service.EmailService;
 import naitei.group5.workingspacebooking.service.UserService;
-import java.security.SecureRandom;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 
