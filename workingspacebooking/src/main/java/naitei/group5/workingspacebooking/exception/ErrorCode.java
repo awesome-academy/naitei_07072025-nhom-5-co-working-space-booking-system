@@ -14,11 +14,13 @@ public enum ErrorCode {
     VENUE_NOT_FOUND(HttpStatus.NOT_FOUND, "Venue not found"),
     VENUE_ALREADY_EXISTS(HttpStatus.CONFLICT, "Venue already exists"),
     VENUE_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "Venue not verified"),
+    PRICE_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "Price rule not found for this slot"),
 
     // BOOKING
     BOOKING_NOT_FOUND(HttpStatus.NOT_FOUND, "Booking not found"),
     BOOKING_CONFLICT(HttpStatus.CONFLICT, "Booking time conflict"),
     INVALID_BOOKING_STATUS(HttpStatus.BAD_REQUEST, "Invalid booking status"),
+    INVALID_DURATION(HttpStatus.BAD_REQUEST, "Booking duration must be greater than 0"),
 
     // PAYMENT
     PAYMENT_FAILED(HttpStatus.BAD_REQUEST, "Payment process failed"),
@@ -55,6 +57,7 @@ public enum ErrorCode {
 
     // SYSTEM
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+
 
     private final HttpStatus status;
     private final String message;
