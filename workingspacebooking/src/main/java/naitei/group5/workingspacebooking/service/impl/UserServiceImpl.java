@@ -2,16 +2,23 @@ package naitei.group5.workingspacebooking.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import naitei.group5.workingspacebooking.entity.enums.UserRole;
+import naitei.group5.workingspacebooking.exception.ResourceNotFoundException;
+import naitei.group5.workingspacebooking.utils.ConverterDto;
 import naitei.group5.workingspacebooking.utils.PasswordUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import naitei.group5.workingspacebooking.config.JwtUserDetails;
 import naitei.group5.workingspacebooking.dto.request.RegisterRequest;
 import naitei.group5.workingspacebooking.dto.response.RegisterResponse;
+import naitei.group5.workingspacebooking.dto.response.UserResponse;
 import naitei.group5.workingspacebooking.entity.User;
 import naitei.group5.workingspacebooking.repository.UserRepository;
 import naitei.group5.workingspacebooking.service.EmailService;
 import naitei.group5.workingspacebooking.service.UserService;
 import java.security.SecureRandom;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +27,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final EmailService emailService;
+	private final MessageSource messageSource;
 
     @Override
     public RegisterResponse registerRenter(RegisterRequest request) {
@@ -66,5 +74,21 @@ public class UserServiceImpl implements UserService {
                 .email(user.getEmail())
                 .role(user.getRole())
                 .build();
+    }
+
+    @Override
+    public UserResponse getUserProfile(JwtUserDetails userDetails) {
+        Integer userId = userDetails.getId();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        getMessage("user.profile.notfound", userId)
+                ));
+
+        return ConverterDto.toUserResponse(user);
+    }
+
+	private String getMessage(String key, Object... args) {
+        return messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
     }
 }

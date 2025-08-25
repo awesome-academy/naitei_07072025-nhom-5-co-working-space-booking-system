@@ -50,7 +50,9 @@ public class SecurityConfig {
                                 AUTH_LOGOUT,
                                 AUTH_RECOVERY,
                                 AUTH_REGISTER_RENTER,
-                                AUTH_REGISTER_OWNER
+                                AUTH_REGISTER_OWNER,
+                                USER_ROLE,
+                                OWNER_VENUES
                         ).permitAll()
                         // Admin routes require ADMIN role
                         .requestMatchers(ADMIN_BASE).hasRole("ADMIN")
