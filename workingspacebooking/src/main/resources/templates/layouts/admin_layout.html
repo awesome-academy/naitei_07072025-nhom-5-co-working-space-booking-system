@@ -12,7 +12,7 @@
     <div class="row">
         <!-- Sidebar -->
         <div class="col-3 bg-dark vh-100">
-            <div th:replace="fragments/sidebar :: sidebarFragment"></div>
+            <div th:replace="~{fragments/sidebar :: sidebarFragment}"></div>
         </div>
 
         <!-- Main Content -->
@@ -25,7 +25,7 @@
 </div>
 
 <!-- Footer -->
-<div th:replace="fragments/footer :: footerFragment"></div>
+<div th:replace="~{fragments/footer :: footerFragment}"></div>
 
 </body>
 </html>
