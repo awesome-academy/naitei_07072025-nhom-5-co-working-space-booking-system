@@ -46,5 +46,4 @@ public class AuthApiController {
         if (token != null) authService.logout(token);
         return ResponseEntity.noContent().build();
     }
-    
 }
