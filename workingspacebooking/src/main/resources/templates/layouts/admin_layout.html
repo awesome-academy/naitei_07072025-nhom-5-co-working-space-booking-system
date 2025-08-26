@@ -9,36 +9,35 @@
 </head>
 <body>
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <div class="col-3 bg-dark vh-100">
-            <div th:replace="~{fragments/sidebar :: sidebarFragment}"></div>
-        </div>
+<div class="admin-layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div th:replace="~{fragments/sidebar :: sidebarFragment}"></div>
+    </div>
 
-        <!-- Main Content -->
-        <div class="col-9 p-4 bg-white">
-            <!-- Language Switcher -->
-            <div class="d-flex justify-content-end mb-3">
-                <div class="dropdown">
-                    <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-translate"></i> <span th:text="#{app.language}">Language</span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item language-item" href="#" data-lang="vi" onclick="changeLanguage('vi')">
-                            🇻🇳 <span th:text="#{app.language.vietnamese}">Tiếng Việt</span>
-                        </a></li>
-                        <li><a class="dropdown-item language-item" href="#" data-lang="en" onclick="changeLanguage('en')">
-                            🇺🇸 <span th:text="#{app.language.english}">English</span>
-                        </a></li>
-                    </ul>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Language Switcher -->
+        <div class="d-flex justify-content-end mb-3">
+            <div class="custom-dropdown">
+                <button class="dropdown-btn" type="button" onclick="toggleDropdown()">
+                    <i class="bi bi-translate"></i> <span th:text="#{app.language}">Language</span>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="dropdown-menu-custom" id="languageDropdown">
+                    <a class="dropdown-item language-item" href="#" data-lang="vi">
+                        🇻🇳 <span th:text="#{app.language.vietnamese}">Tiếng Việt</span>
+                    </a>
+                    <a class="dropdown-item language-item" href="#" data-lang="en">
+                        🇺🇸 <span th:text="#{app.language.english}">English</span>
+                    </a>
                 </div>
             </div>
-            
-            <!-- Page Content -->
-            <div layout:fragment="content">
-                <!-- Page content goes here -->
-            </div>
+        </div>
+        
+        <!-- Page Content -->
+        <div layout:fragment="content">
+            <!-- Page content goes here -->
         </div>
     </div>
 </div>

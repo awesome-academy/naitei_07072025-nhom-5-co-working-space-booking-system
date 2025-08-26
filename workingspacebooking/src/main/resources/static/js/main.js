@@ -1,22 +1,70 @@
-/* ===== Admin Interface JavaScript =====
- * - Language switcher functionality
- * - Sidebar navigation highlighting
- * - DOM ready initialization
+/* ===== ADMIN INTERFACE JAVASCRIPT =====
+ * File JavaScript tổng hợp cho toàn bộ admin interface
+ * Bao gồm: Language switcher, Navigation, DOM initialization
  */
 
 document.addEventListener("DOMContentLoaded", function () {
     initializeLanguageSwitcher();
     initializeSidebarNavigation();
+    initializeLanguageSwitcherEvents();
+    initializeClickOutsideHandler();
 });
 
+// ===== Custom Dropdown Functions =====
+
+function toggleDropdown() {
+    const dropdown = document.querySelector('.custom-dropdown');
+    const isShow = dropdown.classList.contains('show');
+    
+    if (isShow) {
+        closeDropdown();
+    } else {
+        openDropdown();
+    }
+}
+
+function openDropdown() {
+    const dropdown = document.querySelector('.custom-dropdown');
+    dropdown.classList.add('show');
+}
+
+function closeDropdown() {
+    const dropdown = document.querySelector('.custom-dropdown');
+    dropdown.classList.remove('show');
+}
+
+function initializeClickOutsideHandler() {
+    document.addEventListener('click', function(event) {
+        const dropdown = document.querySelector('.custom-dropdown');
+        if (dropdown && !dropdown.contains(event.target)) {
+            closeDropdown();
+        }
+    });
+}
+
 // ===== Language Switcher Functions =====
+
+/**
+ * Khởi tạo event listeners cho language switcher
+ */
+function initializeLanguageSwitcherEvents() {
+    const languageItems = document.querySelectorAll('.language-item');
+    
+    languageItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const lang = this.getAttribute('data-lang');
+            changeLanguage(lang);
+        });
+    });
+}
 
 /**
  * Thay đổi ngôn ngữ của trang
  * @param {string} lang - Mã ngôn ngữ ('vi' hoặc 'en')
  */
 function changeLanguage(lang) {
-    const url = new URL(window.location);
+    const url = new URL(window.location.href);
     url.searchParams.set('lang', lang);
     window.location.href = url.toString();
 }

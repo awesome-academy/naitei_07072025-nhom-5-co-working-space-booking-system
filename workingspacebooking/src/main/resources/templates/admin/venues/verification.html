@@ -5,71 +5,50 @@
 <head>
     <meta charset="UTF-8">
 </head>
-<body th:with="pageTitle=#{venue.admin.list.title}">
+<body th:with="pageTitle=#{venue.verification.title}">
 <div layout:fragment="content">
-    <h2 th:text="#{venue.admin.list.title}">Co-working Space Management</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 th:text="#{venue.verification.title}">Xác thực Co-Working Space</h2>
+        <a th:href="@{/admin/venues}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i><span th:text="#{venue.back.to.list}">Quay về danh sách Co-working space</span>
+        </a>
+    </div>
     <hr class="text-secondary">
     
-    <!-- Navigation Button -->
-    <div class="mb-3">
-        <a th:href="@{/admin/venues/verification}" class="btn btn-primary">
-            <span th:text="#{venue.verification.title}">Xác thực Co-Working Space</span>
-        </a>
+    <!-- Flash Messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     
     <!-- Filter Form -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" th:action="@{/admin/venues}">
+            <form method="GET" th:action="@{/admin/venues/verification}">
                 <div class="row">
-                    <div class="col-md-2">
-                        <label for="name" class="form-label" 
-                               th:text="#{venue.admin.filter.name}">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" 
-                               th:value="${currentName}">
-                    </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <label for="status" class="form-label" 
                                th:text="#{venue.admin.filter.status}">Status</label>
                         <select class="form-control" id="status" name="status">
-                            <option value="" 
-                                    th:selected="${currentStatus == null or currentStatus == ''}"
-                                    th:text="#{venue.admin.filter.all.status}">
-                                All Status
-                            </option>
+                            <option value="all" 
+                                    th:selected="${currentStatus == 'all'}"
+                                    th:text="#{venue.verification.filter.all}">Tất cả</option>
                             <option value="unverified" 
-                                    th:selected="${currentStatus == 'unverified'}"
-                                    th:text="#{venue.status.unverified}">Unverified</option>
+                                    th:selected="${currentStatus == null or currentStatus == '' or currentStatus == 'unverified'}"
+                                    th:text="#{venue.verification.filter.unverified}">Chưa duyệt</option>
                             <option value="verified" 
                                     th:selected="${currentStatus == 'verified'}"
-                                    th:text="#{venue.status.verified}">Verified</option>
-                            <option value="deleted" 
-                                    th:selected="${currentStatus == 'deleted'}"
-                                    th:text="#{venue.status.deleted}">Deleted</option>
+                                    th:text="#{venue.verification.filter.verified}">Đã duyệt</option>
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="sort" class="form-label" 
-                               th:text="#{venue.admin.filter.sort}">Sort</label>
-                        <select class="form-control" id="sort" name="sort">
-                            <option value="name_asc" 
-                                    th:selected="${currentSort == null or currentSort == '' or currentSort == 'name_asc'}"
-                                    th:text="#{venue.sort.name_asc}">Name A-Z</option>
-                            <option value="name_desc" 
-                                    th:selected="${currentSort == 'name_desc'}"
-                                    th:text="#{venue.sort.name_desc}">Name Z-A</option>
-                            <option value="capacity_asc" 
-                                    th:selected="${currentSort == 'capacity_asc'}"
-                                    th:text="#{venue.sort.capacity_asc}">Capacity Low-High</option>
-                            <option value="capacity_desc" 
-                                    th:selected="${currentSort == 'capacity_desc'}"
-                                    th:text="#{venue.sort.capacity_desc}">Capacity High-Low</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
                         <label for="size" class="form-label" th:text="#{venue.pagination.perpage}">Hiển thị/trang</label>
                         <select class="form-control" id="size" name="size">
-                            <option value="20" th:selected="${currentSize == null or currentSize == 20}" th:text="20">20</option>
+                            <option value="20" th:selected="${currentSize == 20}" th:text="20">20</option>
                             <option value="50" th:selected="${currentSize == 50}" th:text="50">50</option>
                             <option value="100" th:selected="${currentSize == 100}" th:text="100">100</option>
                             <option value="-1" th:selected="${currentSize == -1}" th:text="#{venue.pagination.all}">Tất cả</option>
@@ -79,7 +58,12 @@
                         <label class="form-label">&nbsp;</label>
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary" th:text="#{common.filter}">Filter</button>
-                            <a th:href="@{/admin/venues}" class="btn btn-secondary" th:text="#{common.reset}">Reset</a>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/admin/venues/verification}" class="btn btn-secondary" th:text="#{common.reset}">Reset</a>
                         </div>
                     </div>
                 </div>
@@ -98,6 +82,7 @@
                 <th th:text="#{venue.column.location}">Location</th>
                 <th th:text="#{venue.column.style}">Style</th>
                 <th th:text="#{venue.column.status}">Status</th>
+                <th th:text="#{common.actions}">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -111,19 +96,42 @@
                 <td>
                     <span th:if="${venueView.deleted}" 
                           class="badge bg-danger" 
-                          th:text="#{venue.status.deleted}">Đã xóa</span>
-                    
+                          th:text="#{venue.status.deleted}">Deleted</span>
                     <span th:if="${!venueView.deleted and venueView.venue.verified}" 
                           class="badge bg-success" 
-                          th:text="#{venue.status.verified}">Đã duyệt</span>
-                    
+                          th:text="#{venue.status.verified}">Verified</span>
                     <span th:if="${!venueView.deleted and !venueView.venue.verified}" 
                           class="badge bg-warning text-dark" 
-                          th:text="#{venue.status.unverified}">Chưa duyệt</span>
+                          th:text="#{venue.status.unverified}">Unverified</span>
+                </td>
+                <td>
+                    <!-- Single Actions -->
+                    <div th:if="${!venueView.deleted}">
+                        <form th:if="${!venueView.venue.verified}" 
+                              th:action="@{/admin/venues/{id}/approve(id=${venueView.venue.id})}" 
+                              method="post" class="d-inline-form">
+                            <input type="hidden" name="_method" value="patch">
+                            <input type="hidden" name="status" th:value="${currentStatus}">
+                            <input type="hidden" name="page" th:value="${currentPage}">
+                            <input type="hidden" name="size" th:value="${currentSize}">
+                            <button type="submit" class="btn btn-sm btn-success" 
+                                    th:text="#{venue.action.approve}">Duyệt</button>
+                        </form>
+                        <form th:if="${venueView.venue.verified}" 
+                              th:action="@{/admin/venues/{id}/unverify(id=${venueView.venue.id})}" 
+                              method="post" class="d-inline-form">
+                            <input type="hidden" name="_method" value="patch">
+                            <input type="hidden" name="status" th:value="${currentStatus}">
+                            <input type="hidden" name="page" th:value="${currentPage}">
+                            <input type="hidden" name="size" th:value="${currentSize}">
+                            <button type="submit" class="btn btn-sm btn-warning" 
+                                    th:text="#{venue.action.unverify}">Bỏ duyệt</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             <tr th:if="${isShowAll ? #lists.isEmpty(venues) : venues.empty}">
-                <td colspan="7" class="text-center text-muted" th:text="#{venue.table.empty}">No venues found</td>
+                <td colspan="8" class="text-center text-muted" th:text="#{venue.table.empty}">No venues found</td>
             </tr>
         </tbody>
     </table>
@@ -135,7 +143,7 @@
                 <!-- Previous Page -->
                 <li class="page-item" th:classappend="${venues.first} ? 'disabled'">
                     <a class="page-link" 
-                       th:href="@{/admin/venues(name=${currentName}, status=${currentStatus}, sort=${currentSort}, page=${venues.number - 1}, size=${currentSize})}"
+                       th:href="@{/admin/venues/verification(status=${currentStatus}, page=${venues.number - 1}, size=${currentSize})}"
                        th:unless="${venues.first}" th:text="#{pagination.previous}">‹ Previous</a>
                     <span class="page-link text-muted" th:if="${venues.first}" th:text="#{pagination.previous}">‹ Previous</span>
                 </li>
@@ -146,14 +154,14 @@
                     class="page-item"
                     th:classappend="${pageNum == venues.number} ? 'active'">
                     <a class="page-link" 
-                       th:href="@{/admin/venues(name=${currentName}, status=${currentStatus}, sort=${currentSort}, page=${pageNum}, size=${currentSize})}"
+                       th:href="@{/admin/venues/verification(status=${currentStatus}, page=${pageNum}, size=${currentSize})}"
                        th:text="${pageNum + 1}">1</a>
                 </li>
 
                 <!-- Next Page -->  
                 <li class="page-item" th:classappend="${venues.last} ? 'disabled'">
                     <a class="page-link"
-                       th:href="@{/admin/venues(name=${currentName}, status=${currentStatus}, sort=${currentSort}, page=${venues.number + 1}, size=${currentSize})}"
+                       th:href="@{/admin/venues/verification(status=${currentStatus}, page=${venues.number + 1}, size=${currentSize})}"
                        th:unless="${venues.last}" th:text="#{pagination.next}">Next ›</a>
                     <span class="page-link text-muted" th:if="${venues.last}" th:text="#{pagination.next}">Next ›</span>
                 </li>
@@ -168,5 +176,6 @@
         </small>
     </div>
 </div>
+
 </body>
 </html>
