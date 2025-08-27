@@ -31,7 +31,8 @@ public class SecurityConfig {
 
     // Gom các route của owner
     public static final String[] OWNER_ROUTES = {
-            OWNER_VENUES
+            OWNER_VENUES,
+            OWNER_BOOKINGS
     };
 
     @Bean
