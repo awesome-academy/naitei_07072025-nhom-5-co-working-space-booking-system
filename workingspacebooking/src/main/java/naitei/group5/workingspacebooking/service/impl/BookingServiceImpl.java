@@ -19,6 +19,7 @@ import naitei.group5.workingspacebooking.service.BookingService;
 import naitei.group5.workingspacebooking.utils.JwtUtils;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -56,7 +57,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setVenue(venue);
         booking.setStatus(BookingStatus.booked);
         booking.setCreatedAt(LocalDateTime.now());
-        booking.setTotalAmount(0.0);
+        booking.setTotalAmount(BigDecimal.ZERO);
 
         final Booking savedBooking = bookingRepo.save(booking);
 
@@ -65,10 +66,10 @@ public class BookingServiceImpl implements BookingService {
                 .map(slot -> processSlot(venue, savedBooking, slot))
                 .collect(Collectors.toList());
 
-        // Tính tổng tiền
-        double totalPrice = slots.stream()
-                .mapToDouble(BookingResponse.SlotResponse::getPrice)
-                .sum();
+        // Tính tổng tiền (dùng BigDecimal trực tiếp)
+        BigDecimal totalPrice = slots.stream()
+                .map(BookingResponse.SlotResponse::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         savedBooking.setTotalAmount(totalPrice);
         bookingRepo.save(savedBooking);
@@ -111,7 +112,8 @@ public class BookingServiceImpl implements BookingService {
             throw new InvalidDurationException();
         }
 
-        double slotPrice = priceRule.getPrice().doubleValue() * hours;
+
+        BigDecimal slotPrice = priceRule.getPrice().multiply(BigDecimal.valueOf(hours));
 
         BookingDetail detail = new BookingDetail();
         detail.setBooking(booking);

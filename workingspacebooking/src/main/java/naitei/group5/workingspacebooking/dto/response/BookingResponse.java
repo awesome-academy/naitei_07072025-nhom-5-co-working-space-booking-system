@@ -2,6 +2,8 @@ package naitei.group5.workingspacebooking.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,7 +16,7 @@ public class BookingResponse {
     private String venueName;
     private String status;
     private LocalDateTime createdAt;
-    private Double totalPrice;
+    private BigDecimal totalPrice;
     private List<SlotResponse> slots;
 
     @Data
@@ -22,6 +24,6 @@ public class BookingResponse {
     public static class SlotResponse {
         private LocalDateTime startTime;
         private LocalDateTime endTime;
-        private Double price;
+        private BigDecimal price;
     }
 }
