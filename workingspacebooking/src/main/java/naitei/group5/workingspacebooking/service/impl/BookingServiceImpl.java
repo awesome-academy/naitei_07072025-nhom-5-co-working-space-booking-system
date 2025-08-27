@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepo;
@@ -138,7 +139,6 @@ public class BookingServiceImpl implements BookingService {
      * API xem lịch sử booking
      */
     @Override
-    @Transactional(readOnly = true)
     public List<BookingHistoryResponseDto> getBookingHistory(Integer userId) {
         if (!userRepo.existsById(userId)) {
             throw new UserNotFoundException();
