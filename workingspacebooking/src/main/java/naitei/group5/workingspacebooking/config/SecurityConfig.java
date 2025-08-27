@@ -21,8 +21,12 @@ public class SecurityConfig {
 
     // Gom các route của renter
     public static final String[] RENTER_ROUTES = {
-            RENTER_VENUES_SUB,
-            RENTER_PAYMENT
+            RENTER_VENUES_SUB,   // /api/venues/**
+            RENTER_PAYMENT,
+            RENTER_VENUES,
+            RENTER_VENUES_FILTER,
+            RENTER_BOOKINGS,
+            RENTER_BOOKINGS_HISTORY
     };
 
     // Gom các route của owner

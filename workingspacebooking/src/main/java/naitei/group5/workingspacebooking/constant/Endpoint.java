@@ -9,7 +9,7 @@ public class Endpoint {
 
     public static final String AUTH_REGISTER_RENTER = "/api/auth/register-renter";
     public static final String AUTH_REGISTER_OWNER  = "/api/auth/register-owner";
-    
+
     public static final String USER_ROLE = "/api/users/**";
 
     public static final String OWNER_VENUES = "/api/owner/venues/**";
@@ -18,13 +18,18 @@ public class Endpoint {
     public static final String AUTH_RECOVERY  = "/api/auth/recover/**";
     public static final String AUTH_RECOVERY_CONFIRM = "/api/auth/recover/confirm?token=";
 
-    // renter
+    // renter - venue
     public static final String RENTER_VENUES = "/api/venues";
     public static final String RENTER_VENUES_SUB = "/api/venues/**";
     public static final String RENTER_VENUES_FILTER = "/api/venues/filter";
+
+    // renter - payment
     public static final String RENTER_PAYMENT = "/api/payment/**";
 
-    //admin
-    public static final String ADMIN_BASE = "/admin/**";
+    // renter - bookings
+    public static final String RENTER_BOOKINGS = "/api/renter/bookings";
+    public static final String RENTER_BOOKINGS_HISTORY = "/api/renter/bookings/history";
 
+    // admin
+    public static final String ADMIN_BASE = "/admin/**";
 }
