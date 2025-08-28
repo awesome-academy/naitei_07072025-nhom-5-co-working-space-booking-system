@@ -28,6 +28,12 @@
             Co-working Space Management
         </a>
 
+        <a class="btn btn-outline-light sidebar-nav-item" th:href="@{/admin/bookings}"
+           data-nav="bookings"
+           th:text="#{menu.booking.management}">
+            Booking Management
+        </a>
+
         <form th:action="@{/admin/logout}" method="post">
             <button type="submit" class="btn btn-outline-danger w-100" th:text="#{menu.logout}">Logout</button>
         </form>
