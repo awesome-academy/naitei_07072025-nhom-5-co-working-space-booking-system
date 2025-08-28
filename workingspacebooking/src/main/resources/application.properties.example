@@ -24,6 +24,9 @@ spring.messages.basename=i18n/messages
 spring.messages.encoding=UTF-8
 spring.messages.fallback-to-system-locale=false
 
+# Enable HTTP Method Override for RESTful
+spring.mvc.hiddenmethod.filter.enabled=true
+
 # Async Configuration for Email Sending
 spring.task.execution.pool.core-size=5
 spring.task.execution.pool.max-size=20

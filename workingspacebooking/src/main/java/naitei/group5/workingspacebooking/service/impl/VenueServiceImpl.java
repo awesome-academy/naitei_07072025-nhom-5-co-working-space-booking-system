@@ -246,8 +246,14 @@ public class VenueServiceImpl implements VenueService {
 
     // ==== Admin use cases ====
     @Override
-    public List<AdminVenueViewDto> adminListVenues(String name, String status, String sort) {
-        // Status
+    public org.springframework.data.domain.Page<AdminVenueViewDto> adminListVenues(String name, String status, String sort, int page, int size) {
+        // Display all
+        if (size <= 0) {
+            size = Integer.MAX_VALUE;
+            page = 0;
+        }
+
+        // Status normalization
         String normalizedStatus = null;
         if (status != null && !status.isBlank()) {
             String trimmed = status.trim().toLowerCase();
@@ -256,7 +262,7 @@ public class VenueServiceImpl implements VenueService {
             }
         }
 
-        // Sort
+        // Sort normalization
         String normalizedSort = "name_asc";
         if (sort != null && !sort.isBlank()) {
             String trimmed = sort.trim().toLowerCase();
@@ -268,15 +274,18 @@ public class VenueServiceImpl implements VenueService {
 
         var spec = VenueSpecs.byAdminFilter(name, normalizedStatus);
         Sort sortObject = buildSortObject(normalizedSort);
-        List<Venue> venues = venueRepository.findAll(spec, sortObject);
+        
+        // Pageable
+        org.springframework.data.domain.Pageable pageable = 
+            org.springframework.data.domain.PageRequest.of(page, size, sortObject);
+        
+        org.springframework.data.domain.Page<Venue> venuesPage = venueRepository.findAll(spec, pageable);
 
-        return venues.stream()
-                .map(venue -> AdminVenueViewDto.from(
-                    ConverterDto.toVenueResponseDto(venue),
-                    venue.getOwner() != null ? venue.getOwner().getName() : null,
-                    venue.getDeleted()
-                ))
-                .toList();
+        return venuesPage.map(venue -> AdminVenueViewDto.from(
+            ConverterDto.toVenueResponseDto(venue),
+            venue.getOwner() != null ? venue.getOwner().getName() : null,
+            venue.getDeleted()
+        ));
     }
 
     private Sort buildSortObject(String sortParam) {
@@ -286,6 +295,47 @@ public class VenueServiceImpl implements VenueService {
             case "capacity_desc" -> Sort.by(Sort.Direction.DESC, "capacity");
             default -> Sort.by(Sort.Direction.ASC, "name");
         };
+    }
+
+        // ==== Admin venue verification methods ====
+    private Venue loadActiveVenue(Integer id) {
+        Venue venue = venueRepository.findById(id)
+                .orElseThrow(() -> new VenueNotFoundException(id));
+        
+        if (venue.getDeleted()) {
+            throw new VenueVerificationException(
+                "operation", id, "Cannot perform operation on deleted venue");
+        }
+        
+        return venue;
+    }
+
+    @Override
+    @Transactional
+    public void approveVenue(Integer id) {
+        Venue venue = loadActiveVenue(id);
+        
+        if (Boolean.TRUE.equals(venue.getVerified())) {
+            throw new VenueVerificationException(
+                "approve", id, "Venue is already approved");
+        }
+        
+        venue.setVerified(true);
+        venueRepository.save(venue);
+    }
+
+    @Override
+    @Transactional
+    public void unverifyVenue(Integer id) {
+        Venue venue = loadActiveVenue(id);
+        
+        if (!Boolean.TRUE.equals(venue.getVerified())) {
+            throw new VenueVerificationException(
+                "unverify", id, "Venue is already unverified");
+        }
+        
+        venue.setVerified(false);
+        venueRepository.save(venue);
     }
     
 }

@@ -1,7 +1,50 @@
-/* ===== Admin Layout CSS =====
-   - File CSS chính cho admin interface
-   - Chứa styles cho sidebar navigation và language switcher
-*/
+/* ===== ADMIN INTERFACE CSS =====
+ * File CSS tổng hợp cho toàn bộ admin interface
+ * Bao gồm: Layout, Navigation, Forms, Components
+ */
+
+/* ===== Admin Layout Styles ===== */
+.admin-layout {
+    min-height: 100vh;
+    display: flex;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 25%;
+    height: 100vh;
+    background-color: #212529 !important;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 25%;
+    background-color: white;
+    padding: 1.5rem;
+    min-height: 100vh;
+}
+
+/* Scroll styling for sidebar */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: #343a40;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #6c757d;
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #adb5bd;
+}
 
 /* ===== Sidebar Navigation Styles ===== */
 .sidebar-nav-item {
@@ -30,12 +73,78 @@
 }
 
 /* ===== Language Switcher Styles ===== */
+/* Custom Dropdown without Bootstrap */
+.custom-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-btn {
+    background-color: #fff;
+    border: 1px solid #6c757d;
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.15s ease-in-out;
+    color: #6c757d;
+}
+
+.dropdown-btn:hover {
+    background-color: #e9ecef;
+    border-color: #5c636a;
+    color: #5c636a;
+}
+
+.dropdown-arrow {
+    font-size: 0.75rem;
+    transition: transform 0.15s ease-in-out;
+}
+
+.custom-dropdown.show .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu-custom {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1000;
+    display: none;
+    min-width: 10rem;
+    padding: 0.5rem 0;
+    margin: 0.125rem 0 0;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.175);
+    border-radius: 0.375rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+}
+
+.custom-dropdown.show .dropdown-menu-custom {
+    display: block;
+}
+
 .language-item {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    clear: both;
+    font-weight: 400;
+    color: #212529;
+    text-align: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
     transition: all 0.2s ease-in-out;
 }
 
 .language-item:hover {
     background-color: #f8f9fa !important;
+    color: #1e2125;
 }
 
 .language-item.active {
@@ -157,4 +266,12 @@
 .chart-card:hover {
     transform: translateY(-2px);
     transition: transform 0.3s ease;
+/* ===== Admin Form Components ===== */
+.venue-inline-form {
+    display: inline;
+}
+
+/* Utility Classes */
+.d-inline-form {
+    display: inline;
 }

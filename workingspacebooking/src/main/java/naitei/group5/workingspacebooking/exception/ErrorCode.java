@@ -14,6 +14,7 @@ public enum ErrorCode {
     VENUE_NOT_FOUND(HttpStatus.NOT_FOUND, "Venue not found"),
     VENUE_ALREADY_EXISTS(HttpStatus.CONFLICT, "Venue already exists"),
     VENUE_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "Venue not verified"),
+    VENUE_VERIFICATION_FAILED(HttpStatus.BAD_REQUEST, "Venue verification operation failed"),
     PRICE_RULE_NOT_FOUND(HttpStatus.NOT_FOUND, "Price rule not found for this slot"),
 
     // BOOKING

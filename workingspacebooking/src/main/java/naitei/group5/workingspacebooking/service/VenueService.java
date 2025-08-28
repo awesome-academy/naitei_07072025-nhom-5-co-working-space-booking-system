@@ -38,6 +38,10 @@ public interface VenueService {
     VenueDetailRenterResponseDto getVenueDetail(Integer venueId);
 
     // ==== Admin use cases ====
-    List<AdminVenueViewDto> adminListVenues(String name, String status, String sort);
+    org.springframework.data.domain.Page<AdminVenueViewDto> adminListVenues(String name, String status, String sort, int page, int size);
+
+    // Admin venue verification
+    void approveVenue(Integer id);
+    void unverifyVenue(Integer id);
 
 }

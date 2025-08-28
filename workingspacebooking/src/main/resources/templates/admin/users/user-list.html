@@ -66,7 +66,7 @@
                 <form th:if="${user.role.name() == 'pending_owner'}"
                       th:action="@{'/admin/users/' + ${user.id} + '/approve-owner'}"
                       method="post"
-                      style="display:inline;">
+                      class="d-inline-form">
                     <button type="submit" class="btn btn-success btn-sm" th:text="#{user.action.approve.owner}">Approve</button>
                 </form>
                 <span th:unless="${user.role.name() == 'pending_owner'}" class="text-muted">—</span>
