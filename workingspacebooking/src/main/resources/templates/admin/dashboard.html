@@ -5,42 +5,186 @@
       layout:decorate="~{layouts/admin_layout}">
 <head>
     <meta charset="UTF-8">
+    <!-- CSS Files -->
+    <link th:href="@{/css/style.css}" href="/css/style.css" rel="stylesheet">
+
+    <!-- External Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body th:with="pageTitle=#{dashboard.title}">
 <div layout:fragment="content">
-    <h2><span th:text="#{dashboard.welcome}">Welcome</span>, <span th:text="${userName}">Admin</span> 👋</h2>
-    <hr class="text-secondary">
+    <!-- Data attributes for JavaScript -->
+    <div id="dashboard-data" style="display: none;"
+         th:attr="data-total-users=${totalUsers},
+                  data-pending-owners=${totalPendingOwners},
+                  data-total-venues=${totalVenues},
+                  data-verified-venues=${totalVerifiedVenues},
+                  data-deleted-venues=${totalDeletedVenues},
+                  data-total-bookings=${totalBookings},
+                  data-total-notifications=${totalNotifications}">
+    </div>
 
-    <div class="row">
-        <div class="col-md-4 mb-3">
-            <div class="card text-dark shadow">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <h2 class="mb-0">
+            <span th:text="#{dashboard.welcome}">Chào mừng</span>,
+            <span th:text="${userName}">Admin</span> 👋
+        </h2>
+        <p class="mb-0 mt-2 opacity-75" th:text="#{dashboard.menu.instruction}">
+            Vui lòng chọn menu bên trái để quản lý chi tiết.
+        </p>
+    </div>
+
+    <!-- Stats Cards Row -->
+    <div class="row g-4">
+        <!-- Tổng số người dùng -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stats-card stats-card-users">
                 <div class="card-body">
-                    <h5 class="card-title" th:text="#{dashboard.total.users}">Tổng số người dùng</h5>
-                    <p class="card-text display-6">123</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-2" th:text="#{dashboard.total.users}">Tổng số người dùng</h6>
+                            <p class="display-6 mb-1" th:text="${totalUsers}">0</p>
+                            <small class="opacity-75">
+                                <span th:text="#{dashboard.pending.owners}">Chủ sở hữu đang chờ duyệt</span>:
+                                <strong th:text="${totalPendingOwners}">0</strong>
+                            </small>
+                        </div>
+                        <div class="fs-1 opacity-25">👥</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4 mb-3">
-            <div class="card text-dark shadow">
+        <!-- Tổng số venue -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stats-card stats-card-venues">
                 <div class="card-body">
-                    <h5 class="card-title" th:text="#{dashboard.system.reports}">Báo cáo hệ thống</h5>
-                    <p class="card-text display-6">8</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-2" th:text="#{dashboard.total.venues}">Tổng số địa điểm</h6>
+                            <p class="display-6 mb-1" th:text="${totalVenues}">0</p>
+                            <small class="opacity-75">
+                                <span th:text="#{dashboard.verified}">Đã xác minh</span>:
+                                <strong th:text="${totalVerifiedVenues}">0</strong>,
+                                <span th:text="#{dashboard.deleted}">Đã xóa</span>:
+                                <strong th:text="${totalDeletedVenues}">0</strong>
+                            </small>
+                        </div>
+                        <div class="fs-1 opacity-25">🏢</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4 mb-3">
-            <div class="card text-dark shadow">
+        <!-- Tổng số booking -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stats-card stats-card-bookings">
                 <div class="card-body">
-                    <h5 class="card-title" th:text="#{dashboard.other.info}">Thông tin khác</h5>
-                    <p class="card-text display-6">N/A</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-2" th:text="#{dashboard.total.bookings}">Tổng số đặt chỗ</h6>
+                            <p class="display-6 mb-1" th:text="${totalBookings}">0</p>
+                            <small class="opacity-75">Tất cả đặt chỗ trong hệ thống</small>
+                        </div>
+                        <div class="fs-1 opacity-25">📅</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Báo cáo hệ thống -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stats-card stats-card-reports">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-2" th:text="#{dashboard.system.reports}">Báo cáo hệ thống</h6>
+                            <p class="display-6 mb-1" th:text="${totalNotifications}">0</p>
+                            <small class="opacity-75">Thông báo & báo cáo</small>
+                        </div>
+                        <div class="fs-1 opacity-25">📊</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <p class="mt-4" th:text="#{dashboard.menu.instruction}">Hãy chọn menu bên trái để quản lý chi tiết.</p>
+    <!-- Charts Row -->
+    <div class="row g-4 mt-2">
+        <!-- Biểu đồ tròn Venue Status -->
+        <div class="col-lg-6">
+            <div class="card chart-card">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4" th:text="#{dashboard.venue.chart.title}">
+                        Trạng thái địa điểm
+                    </h5>
+                    <div class="chart-container">
+                        <canvas id="venueStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ cột người dùng -->
+        <div class="col-lg-6">
+            <div class="card chart-card">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4">Thống kê người dùng</h5>
+                    <div class="chart-container">
+                        <canvas id="userStatsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ đường xu hướng đặt chỗ -->
+        <div class="col-lg-8">
+            <div class="card chart-card">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4">Xu hướng đặt chỗ theo tháng</h5>
+                    <div class="chart-container">
+                        <canvas id="bookingTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- JavaScript Files -->
+<script th:src="@{/js/main.js}" src="/js/main.js"></script>
+
+<!-- Inline script to pass Thymeleaf data to JavaScript -->
+<script th:inline="javascript">
+    // Pass Thymeleaf data to JavaScript
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set data attributes with Thymeleaf values
+        const dataElement = document.getElementById('dashboard-data');
+        if (dataElement) {
+            dataElement.setAttribute('data-total-users', /*[[${totalUsers}]]*/ 0);
+            dataElement.setAttribute('data-pending-owners', /*[[${totalPendingOwners}]]*/ 0);
+            dataElement.setAttribute('data-total-venues', /*[[${totalVenues}]]*/ 0);
+            dataElement.setAttribute('data-verified-venues', /*[[${totalVerifiedVenues}]]*/ 0);
+            dataElement.setAttribute('data-deleted-venues', /*[[${totalDeletedVenues}]]*/ 0);
+            dataElement.setAttribute('data-total-bookings', /*[[${totalBookings}]]*/ 0);
+            dataElement.setAttribute('data-total-notifications', /*[[${totalNotifications}]]*/ 0);
+        }
+
+        // Trigger custom event to notify dashboard.js that data is ready
+        window.dispatchEvent(new CustomEvent('dashboardDataReady', {
+            detail: {
+                totalUsers: /*[[${totalUsers}]]*/ 0,
+                totalPendingOwners: /*[[${totalPendingOwners}]]*/ 0,
+                totalVenues: /*[[${totalVenues}]]*/ 0,
+                totalVerifiedVenues: /*[[${totalVerifiedVenues}]]*/ 0,
+                totalDeletedVenues: /*[[${totalDeletedVenues}]]*/ 0,
+                totalBookings: /*[[${totalBookings}]]*/ 0,
+                totalNotifications: /*[[${totalNotifications}]]*/ 0
+            }
+        }));
+    });
+</script>
+
 </body>
 </html>

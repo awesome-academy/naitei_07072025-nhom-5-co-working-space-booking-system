@@ -11,4 +11,12 @@ public interface AdminService {
 
     UserResponse getUserByEmail(String email);
     UserResponse approveOwner(Integer userId);
+
+    long getTotalUsers();
+    long getTotalPendingOwners();
+    long getTotalVenues();
+    long getTotalVerifiedVenues();
+    long getTotalDeletedVenues();
+    long getTotalBookings();
+    long getTotalNotifications();
 }

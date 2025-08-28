@@ -13,4 +13,6 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
     // filter theo venueName + owner
     List<Booking> findByVenue_NameContainingIgnoreCaseAndVenue_Owner_IdOrderByCreatedAtDesc(String venueName, Integer ownerId);
+
+    long count(); // tổng booking
 }

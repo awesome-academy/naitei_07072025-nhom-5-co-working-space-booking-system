@@ -8,6 +8,9 @@ import naitei.group5.workingspacebooking.entity.User;
 import naitei.group5.workingspacebooking.entity.enums.UserRole;
 import naitei.group5.workingspacebooking.repository.UserRepository;
 import naitei.group5.workingspacebooking.service.AdminService;
+import naitei.group5.workingspacebooking.repository.VenueRepository;
+import naitei.group5.workingspacebooking.repository.BookingRepository;
+import naitei.group5.workingspacebooking.repository.NotificationRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +21,9 @@ public class AdminServiceImpl implements AdminService {
 
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final VenueRepository venueRepository;
+    private final BookingRepository bookingRepository;
+    private final NotificationRepository notificationRepository;
 
     @Override
     public List<UserResponse> getAllUsers() {
@@ -75,5 +81,40 @@ public class AdminServiceImpl implements AdminService {
         );
 
         return mapToResponse(saved);
+    }
+
+    @Override
+    public long getTotalUsers() {
+        return userRepository.count();
+    }
+
+    @Override
+    public long getTotalPendingOwners() {
+        return userRepository.countByRole(UserRole.pending_owner);
+    }
+
+    @Override
+    public long getTotalVenues() {
+        return venueRepository.count();
+    }
+
+    @Override
+    public long getTotalVerifiedVenues() {
+        return venueRepository.countByVerifiedTrue();
+    }
+
+    @Override
+    public long getTotalDeletedVenues() {
+        return venueRepository.countByDeletedTrue();
+    }
+
+    @Override
+    public long getTotalBookings() {
+        return bookingRepository.count();
+    }
+
+    @Override
+    public long getTotalNotifications() {
+        return notificationRepository.countByUser_Role(UserRole.admin);
     }
 }

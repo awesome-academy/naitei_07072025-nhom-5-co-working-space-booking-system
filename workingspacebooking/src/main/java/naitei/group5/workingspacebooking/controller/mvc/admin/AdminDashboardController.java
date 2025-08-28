@@ -22,12 +22,19 @@ public class AdminDashboardController extends BaseAdminController {
     @GetMapping("/dashboard")
     public String dashboard(Model model, HttpServletRequest request,
                             @AuthenticationPrincipal JwtUserDetails userDetails) {
-        String email = userDetails.getUsername();
 
-        UserResponse user = adminService.getUserByEmail(email);
+        UserResponse user = adminService.getUserByEmail(userDetails.getUsername());
 
         model.addAttribute("userName", user.getName());
         model.addAttribute("currentUri", request.getRequestURI());
+
+        model.addAttribute("totalUsers", adminService.getTotalUsers());
+        model.addAttribute("totalPendingOwners", adminService.getTotalPendingOwners());
+        model.addAttribute("totalVenues", adminService.getTotalVenues());
+        model.addAttribute("totalVerifiedVenues", adminService.getTotalVerifiedVenues());
+        model.addAttribute("totalDeletedVenues", adminService.getTotalDeletedVenues());
+        model.addAttribute("totalBookings", adminService.getTotalBookings());
+        model.addAttribute("totalNotifications", adminService.getTotalNotifications());
 
         return "admin/dashboard";
     }

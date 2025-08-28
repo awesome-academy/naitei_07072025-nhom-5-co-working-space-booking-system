@@ -58,4 +58,7 @@ public interface VenueRepository extends JpaRepository<Venue, Integer>, JpaSpeci
     int softDeleteByIdAndOwnerId(@Param("venueId") Integer venueId,
                                  @Param("ownerId") Integer ownerId);
 
+    long count(); // tổng venue
+    long countByVerifiedTrue(); // venue đã verify
+    long countByDeletedTrue();  // venue đã xoá mềm
 }
