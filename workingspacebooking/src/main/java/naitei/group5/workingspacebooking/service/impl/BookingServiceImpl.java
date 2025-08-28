@@ -194,22 +194,14 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingHistoryResponseDto> getBookingsByOwner(Integer ownerId) {
-        if (!userRepo.existsById(ownerId)) {
-            throw new UserNotFoundException();
+    public List<BookingHistoryResponseDto> getBookingsForOwner(Integer ownerId, String venueName) {
+        List<Booking> bookings;
+        if (venueName != null && !venueName.isBlank()) {
+            bookings = bookingRepo.findByVenue_NameContainingIgnoreCaseAndVenue_Owner_IdOrderByCreatedAtDesc(
+                    venueName, ownerId);
+        } else {
+            bookings = bookingRepo.findByVenue_Owner_IdOrderByCreatedAtDesc(ownerId);
         }
-
-        List<Booking> bookings = bookingRepo.findByVenue_Owner_IdOrderByCreatedAtDesc(ownerId);
-        return bookings.stream().map(this::mapToDto).toList();
-    }
-
-    @Override
-    public List<BookingHistoryResponseDto> getBookingsByOwnerAndVenueName(Integer ownerId, String venueName) {
-        if (!userRepo.existsById(ownerId)) {
-            throw new UserNotFoundException();
-        }
-
-        List<Booking> bookings = bookingRepo.findByVenue_NameContainingIgnoreCaseAndVenue_Owner_IdOrderByCreatedAtDesc(venueName, ownerId);
         return bookings.stream().map(this::mapToDto).toList();
     }
 

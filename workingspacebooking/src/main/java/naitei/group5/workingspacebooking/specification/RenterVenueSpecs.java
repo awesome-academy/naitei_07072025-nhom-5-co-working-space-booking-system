@@ -28,8 +28,9 @@ public final class RenterVenueSpecs {
         return (root, query, cb) -> {
             List<Predicate> ps = new ArrayList<>();
 
-            // chỉ venue đã verified
+            // chỉ venue đã verified và chưa bị soft delete
             ps.add(cb.isTrue(root.get("verified")));
+            ps.add(cb.isNull(root.get("deletedAt")));
 
             // name
             if (name != null && !name.isBlank()) {
@@ -91,7 +92,7 @@ public final class RenterVenueSpecs {
 
                 if (query != null) {
                     query.distinct(true);
-                }   
+                }
             }
 
             return cb.and(ps.toArray(new Predicate[0]));

@@ -105,7 +105,7 @@ public class VenueServiceImpl implements VenueService {
     // ==== Renter use cases ====
     @Override
     public List<VenueResponseDto> getVerifiedVenues() {
-        return venueRepository.findByVerifiedAndDeletedFalse(true)
+        return venueRepository.findByVerifiedTrueAndDeletedAtIsNull()
                 .stream()
                 .map(ConverterDto::toVenueResponseDto)
                 .toList();

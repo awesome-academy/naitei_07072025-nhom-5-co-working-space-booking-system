@@ -20,10 +20,10 @@ public class AdminDashboardController extends BaseAdminController {
     }
 
     @GetMapping("/dashboard")
-    public String dashboard(Model model, HttpServletRequest request, 
-                           @AuthenticationPrincipal JwtUserDetails userDetails) {
+    public String dashboard(Model model, HttpServletRequest request,
+                            @AuthenticationPrincipal JwtUserDetails userDetails) {
         String email = userDetails.getUsername();
-        
+
         UserResponse user = adminService.getUserByEmail(email);
 
         model.addAttribute("userName", user.getName());
