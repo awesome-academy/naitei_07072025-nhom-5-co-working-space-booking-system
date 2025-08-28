@@ -20,7 +20,7 @@
         <!-- Language Switcher -->
         <div class="d-flex justify-content-end mb-3">
             <div class="custom-dropdown">
-                <button class="dropdown-btn" type="button" onclick="toggleDropdown()">
+                <button class="dropdown-btn dropdown-toggle-btn" type="button">
                     <i class="bi bi-translate"></i> <span th:text="#{app.language}">Language</span>
                     <span class="dropdown-arrow">▼</span>
                 </button>
@@ -43,5 +43,6 @@
 </div>
 
 <script th:src="@{/js/main.js}"></script>
+
 </body>
 </html>

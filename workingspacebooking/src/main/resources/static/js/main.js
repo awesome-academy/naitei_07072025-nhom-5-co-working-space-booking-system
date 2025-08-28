@@ -8,10 +8,23 @@ document.addEventListener("DOMContentLoaded", function () {
     initializeSidebarNavigation();
     initializeLanguageSwitcherEvents();
     initializeClickOutsideHandler();
-    initializeBookingExpandCollapse();
+    initializeDropdownToggle();
+    
+    // Initialize venue-specific functions
+    initializeVenueFunctions();
 });
 
 // ===== Custom Dropdown Functions =====
+
+function initializeDropdownToggle() {
+    const toggleBtn = document.querySelector('.dropdown-toggle-btn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleDropdown();
+        });
+    }
+}
 
 function toggleDropdown() {
     const dropdown = document.querySelector('.custom-dropdown');
@@ -166,6 +179,222 @@ function isCurrentPage(currentPath, navType) {
             return path.startsWith('/admin/bookings');
         default:
             return false;
+    }
+}
+
+// ===============================
+// ADMIN VENUES FUNCTIONS
+// ===============================
+
+/**
+ * Initialize all venue-specific functions
+ */
+function initializeVenueFunctions() {
+    // Only run venue functions if we're on venue pages
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('/admin/venues')) {
+        handleApprovalConfirmation();
+        handleUnverifyConfirmation();
+        autoHideFlashMessages();
+        enhanceTableRows();
+        handleFormSubmissions();
+        handleResponsiveLayout();
+        createImageModal();
+        console.log('Admin Venues JavaScript initialized');
+    }
+}
+
+/**
+ * Xử lý confirm dialog cho việc phê duyệt venue
+ */
+function handleApprovalConfirmation() {
+    const approveButtons = document.querySelectorAll('.venue-approve-btn');
+    approveButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const confirmMessage = this.getAttribute('data-confirm-message') || 
+                                 'Bạn có chắc chắn muốn phê duyệt địa điểm này không?';
+            
+            if (!confirm(confirmMessage)) {
+                e.preventDefault();
+            }
+        });
+    });
+}
+
+/**
+ * Xử lý confirm dialog cho việc hủy xác thực venue
+ */
+function handleUnverifyConfirmation() {
+    const unverifyButtons = document.querySelectorAll('.venue-unverify-btn');
+    unverifyButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const confirmMessage = this.getAttribute('data-confirm-message') || 
+                                 'Bạn có chắc chắn muốn hủy xác thực địa điểm này không?';
+            
+            if (!confirm(confirmMessage)) {
+                e.preventDefault();
+            }
+        });
+    });
+}
+
+/**
+ * Tự động ẩn flash messages sau 5 giây
+ */
+function autoHideFlashMessages() {
+    const alerts = document.querySelectorAll('.alert-dismissible');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            if (typeof bootstrap !== 'undefined' && bootstrap.Alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }
+        }, 5000);
+    });
+}
+
+/**
+ * Thêm hover effect cho table rows
+ */
+function enhanceTableRows() {
+    const tableRows = document.querySelectorAll('.venue-table tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'rgba(0, 123, 255, 0.1)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+        });
+    });
+}
+
+/**
+ * Xử lý form submission với loading state
+ */
+function handleFormSubmissions() {
+    const forms = document.querySelectorAll('.venue-action-form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function() {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+            }
+        });
+    });
+}
+
+/**
+ * Điều chỉnh layout cho mobile
+ */
+function handleResponsiveLayout() {
+    function checkScreenSize() {
+        const isMobile = window.innerWidth < 768;
+        const actionButtons = document.querySelectorAll('.venue-actions-section .btn');
+        
+        actionButtons.forEach(btn => {
+            if (isMobile) {
+                btn.classList.add('btn-block', 'mb-2');
+                btn.style.width = '100%';
+            } else {
+                btn.classList.remove('btn-block', 'mb-2');
+                btn.style.width = '';
+            }
+        });
+    }
+    
+    // Check on load
+    checkScreenSize();
+    
+    // Check on resize
+    window.addEventListener('resize', checkScreenSize);
+}
+
+/**
+ * Tạo modal để xem ảnh venue lớn hơn
+ */
+function createImageModal() {
+    const venueImages = document.querySelectorAll('.venue-detail-image');
+    venueImages.forEach(img => {
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', function() {
+            // Tạo modal đơn giản để hiển thị ảnh
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.innerHTML = `
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Hình ảnh địa điểm</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="${this.src}" alt="${this.alt}" class="img-fluid">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const bsModal = new bootstrap.Modal(modal);
+                bsModal.show();
+                
+                // Xóa modal khi đóng
+                modal.addEventListener('hidden.bs.modal', function() {
+                    this.remove();
+                });
+            }
+        });
+    });
+}
+
+// ===============================
+// UTILITY FUNCTIONS
+// ===============================
+
+/**
+ * Format số với dấu phẩy
+ */
+function formatNumber(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+/**
+ * Show toast notification
+ */
+function showToast(message, type = 'info') {
+    // Tạo toast element nếu chưa có
+    let toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+        document.body.appendChild(toastContainer);
+    }
+    
+    const toastId = 'toast-' + Date.now();
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type} border-0`;
+    toast.id = toastId;
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        // Auto remove after hide
+        toast.addEventListener('hidden.bs.toast', function() {
+            this.remove();
+        });
     }
 }
 

@@ -61,4 +61,16 @@ public interface VenueRepository extends JpaRepository<Venue, Integer>, JpaSpeci
     long count(); // tổng venue
     long countByVerifiedTrue(); // venue đã verify
     long countByDeletedTrue();  // venue đã xoá mềm
+    // Admin: Lấy venue với đầy đủ thông tin cho admin detail view
+    @Query("""
+        SELECT DISTINCT v
+        FROM Venue v
+        JOIN FETCH v.owner o
+        JOIN FETCH v.venueStyle vs
+        LEFT JOIN FETCH v.prices p
+        WHERE v.id = :id
+          AND v.deleted = false
+        """)
+    Optional<Venue> findByIdWithAllDetails(@Param("id") Integer id);
+
 }

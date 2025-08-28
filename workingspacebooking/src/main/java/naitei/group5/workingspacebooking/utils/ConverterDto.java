@@ -234,5 +234,38 @@ public final class ConverterDto {
                 .email(user.getEmail())
                 .phone(user.getPhone())
                 .build();
-    }	
+    }
+
+    // Admin venue detail converter
+    public static VenueDetailAdminResponseDto toVenueDetailAdminResponseDto(
+            Venue v,
+            List<BusySlotDto> busySlots
+    ) {
+        List<PriceResponseDto> prices = 
+                (v.getPrices() != null)
+                        ? v.getPrices().stream().map(ConverterDto::toPriceResponseDto).toList()
+                        : List.of();
+
+        var owner = new VenueDetailAdminResponseDto.OwnerSummary(
+                v.getOwner().getId(),
+                v.getOwner().getName(),
+                v.getOwner().getEmail()
+        );
+
+        return new VenueDetailAdminResponseDto(
+                v.getId(),
+                v.getName(),
+                v.getDescription(),
+                v.getCapacity(),
+                v.getLocation(),
+                v.getImage(),
+                v.getVenueStyle() != null ? v.getVenueStyle().getName() : null,
+                v.getVerified(),
+                owner,
+                prices,
+                busySlots,
+                null, // createdAt - Venue entity không có field này
+                null  // updatedAt - Venue entity không có field này
+        );
+    }
 }
