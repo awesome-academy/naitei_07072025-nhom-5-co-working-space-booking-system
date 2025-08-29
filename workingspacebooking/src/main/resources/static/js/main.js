@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
     initializeSidebarNavigation();
     initializeLanguageSwitcherEvents();
     initializeClickOutsideHandler();
+    initializeBookingExpandCollapse();
 });
 
 // ===== Custom Dropdown Functions =====
@@ -161,6 +162,8 @@ function isCurrentPage(currentPath, navType) {
             return path.startsWith('/admin/notifications');
         case 'venues':
             return path.startsWith('/admin/venues');
+        case 'bookings':
+            return path.startsWith('/admin/bookings');
         default:
             return false;
     }
@@ -473,3 +476,32 @@ window.DashboardCharts = {
     charts: dashboardCharts,
     data: dashboardData
 };
+// ===== Booking Management Functions =====
+
+/**
+ * Khởi tạo chức năng expand/collapse cho booking details
+ */
+function initializeBookingExpandCollapse() {
+    const expandButtons = document.querySelectorAll('.btn-expand');
+    
+    expandButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const targetRow = document.getElementById(targetId);
+            const expandText = this.querySelector('.expand-text');
+            const collapseText = this.querySelector('.collapse-text');
+            
+            if (targetRow && expandText && collapseText) {
+                if (targetRow.style.display === 'none' || targetRow.style.display === '') {
+                    targetRow.style.display = 'table-row';
+                    expandText.style.display = 'none';
+                    collapseText.style.display = 'inline';
+                } else {
+                    targetRow.style.display = 'none';
+                    expandText.style.display = 'inline';
+                    collapseText.style.display = 'none';
+                }
+            }
+        });
+    });
+}

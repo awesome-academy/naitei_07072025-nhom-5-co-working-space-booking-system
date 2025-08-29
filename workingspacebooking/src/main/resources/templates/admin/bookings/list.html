@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layouts/admin_layout}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{booking.admin.title}">Danh sách booking</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" th:text="#{booking.admin.title}">Danh sách booking</h3>
+                    </div>
+
+                    <!-- Filter Form -->
+                    <div class="card-body">
+                        <form method="GET" th:action="@{/admin/bookings}" class="mb-3">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="userEmail" class="form-label" th:text="#{booking.admin.filter.userEmail}">Email người dùng</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="userEmail" 
+                                           name="userEmail"
+                                           th:value="${criteria != null ? criteria.userEmail() : ''}"
+                                           placeholder="Email">
+                                </div>
+                                
+                                <div class="col-md-3">
+                                    <label for="status" class="form-label" th:text="#{booking.admin.filter.status}">Trạng thái</label>
+                                    <select class="form-select" id="status" name="status">
+                                        <option value="" th:text="#{common.all}">Tất cả</option>
+                                        <option th:each="statusValue : ${statuses}" 
+                                                th:value="${statusValue.name()}"
+                                                th:text="#{${'booking.status.' + #strings.toLowerCase(statusValue.name())}}"
+                                                th:selected="${criteria != null and criteria.status() == statusValue.name()}">Status</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-3">
+                                    <label for="venueId" class="form-label" th:text="#{booking.admin.filter.venueId}">ID địa điểm</label>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           id="venueId" 
+                                           name="venueId"
+                                           th:value="${criteria != null ? criteria.venueId() : ''}"
+                                           placeholder="ID">
+                                </div>
+                                
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary me-2" th:text="#{booking.admin.filter.submit}">Lọc</button>
+                                    <a th:href="@{/admin/bookings}" class="btn btn-secondary" th:text="#{common.reset}">Đặt lại</a>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Results Table -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th th:text="#{booking.admin.table.index}">#</th>
+                                        <th th:text="#{booking.admin.table.id}">Booking ID</th>
+                                        <th th:text="#{booking.admin.table.user}">Người dùng</th>
+                                        <th th:text="#{booking.admin.table.venue}">Địa điểm</th>
+                                        <th th:text="#{booking.admin.table.status}">Trạng thái</th>
+                                        <th th:text="#{booking.admin.table.createdAt}">Thời gian tạo</th>
+                                        <th th:text="#{booking.admin.table.slot.count}">Số slot</th>
+                                        <th th:text="#{booking.admin.table.time.range}">Khoảng thời gian</th>
+                                        <th th:text="#{booking.admin.table.total.amount}">Tổng tiền</th>
+                                        <th th:text="#{booking.admin.table.actions}">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Empty state -->
+                                    <tr th:if="${!hasContent}">
+                                        <td colspan="10" class="text-center" th:text="#{booking.admin.table.empty}">Không có booking nào</td>
+                                    </tr>
+                                    
+                                    <!-- Booking rows -->
+                                    <th:block th:if="${hasContent}" th:each="booking, iterStat : ${bookingsPage.content}">
+                                        <!-- Main booking row -->
+                                        <tr class="booking-row">
+                                            <td th:text="${iterStat.count + (currentPage - 1) * bookingsPage.size}">1</td>
+                                            <td th:text="${booking.bookingId()}">ID</td>
+                                            <td>
+                                                <div th:text="${booking.userName()}">User Name</div>
+                                                <small class="text-muted" th:text="${booking.userEmail()}">user@example.com</small>
+                                            </td>
+                                            <td th:text="${booking.venueName()}">Venue Name</td>
+                                            <td>
+                                                <span class="badge" 
+                                                      th:class="${booking.status() == 'booked'} ? 'badge bg-success' : 
+                                                                 (${booking.status() == 'canceled'} ? 'badge bg-danger' : 'badge bg-secondary')"
+                                                      th:text="#{${'booking.status.' + #strings.toLowerCase(booking.status())}}">Status</span>
+                                            </td>
+                                            <td th:text="${#temporals.format(booking.createdAt(), 'yyyy-MM-dd HH:mm')}">2023-01-01 12:00</td>
+                                            <td th:text="${booking.slotCount()}">3</td>
+                                            <td>
+                                                <span th:if="${booking.earliestStart() != null and booking.latestEnd() != null}">
+                                                    <span th:text="${#temporals.format(booking.earliestStart(), 'yyyy-MM-dd HH:mm')}">Start</span>
+                                                    -
+                                                    <span th:text="${#temporals.format(booking.latestEnd(), 'yyyy-MM-dd HH:mm')}">End</span>
+                                                </span>
+                                                <span th:unless="${booking.earliestStart() != null and booking.latestEnd() != null}" 
+                                                      th:text="#{booking.admin.table.time.none}">-</span>
+                                            </td>
+                                            <td>
+                                                <span th:if="${booking.totalAmount() != null}" 
+                                                      th:text="${#numbers.formatDecimal(booking.totalAmount(), 0, 'COMMA', 2, 'POINT')} + ' VND'">0.00 VND</span>
+                                                <span th:unless="${booking.totalAmount() != null}">-</span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-info btn-expand" 
+                                                        th:data-target="${'booking-' + booking.bookingId()}"
+                                                        type="button">
+                                                    <span class="expand-text" th:text="#{booking.admin.table.expand}">Xem chi tiết</span>
+                                                    <span class="collapse-text" style="display: none;" th:text="#{booking.admin.table.collapse}">Thu gọn</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- Slots details row (hidden by default) -->
+                                        <tr class="slots-row" th:id="${'booking-' + booking.bookingId()}" style="display: none;">
+                                            <td colspan="10">
+                                                <div class="p-3 bg-light">
+                                                    <h6 th:text="#{booking.admin.slots.title}">Chi tiết slot</h6>
+                                                    <div th:if="${#lists.isEmpty(booking.slots())}" class="text-muted">
+                                                        Không có chi tiết slot
+                                                    </div>
+                                                    <table th:unless="${#lists.isEmpty(booking.slots())}" class="table table-sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <th th:text="#{booking.admin.slots.slot}">Slot</th>
+                                                                <th th:text="#{booking.admin.slots.start}">Giờ bắt đầu</th>
+                                                                <th th:text="#{booking.admin.slots.end}">Giờ kết thúc</th>
+                                                                <th th:text="#{booking.admin.slots.duration}">Thời lượng (phút)</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr th:each="slot, slotStat : ${booking.slots()}">
+                                                                <td th:text="${'#' + (slotStat.count)}">Slot #1</td>
+                                                                <td th:text="${#temporals.format(slot.startTime(), 'yyyy-MM-dd HH:mm')}">Start Time</td>
+                                                                <td th:text="${#temporals.format(slot.endTime(), 'yyyy-MM-dd HH:mm')}">End Time</td>
+                                                                <td th:text="${slot.durationMinutes()}">60</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </th:block>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav th:if="${hasContent and totalPages > 1}" aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                                    <a class="page-link" 
+                                       th:href="@{/admin/bookings(page=${currentPage - 1}, size=${bookingsPage.size}, 
+                                                                  status=${criteria.status()}, 
+                                                                  userEmail=${criteria.userEmail()}, 
+                                                                  venueId=${criteria.venueId()})}"
+                                       aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                
+                                <li class="page-item active">
+                                    <span class="page-link" th:text="${currentPage + ' / ' + totalPages}">1 / 5</span>
+                                </li>
+                                
+                                <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                                    <a class="page-link" 
+                                       th:href="@{/admin/bookings(page=${currentPage + 1}, size=${bookingsPage.size}, 
+                                                                  status=${criteria.status()}, 
+                                                                  userEmail=${criteria.userEmail()}, 
+                                                                  venueId=${criteria.venueId()})}"
+                                       aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

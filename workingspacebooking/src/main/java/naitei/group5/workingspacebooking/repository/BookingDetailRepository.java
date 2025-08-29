@@ -60,4 +60,7 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, In
                            @Param("startTime") LocalDateTime startTime,
                            @Param("endTime") LocalDateTime endTime);
 
+    // Admin: Lấy tất cả BookingDetail theo list booking id
+    List<BookingDetail> findByBookingIdIn(List<Integer> bookingIds);
+
 }
