@@ -2,6 +2,8 @@ package naitei.group5.workingspacebooking.controller.mvc.admin;
 
 import lombok.RequiredArgsConstructor;
 import naitei.group5.workingspacebooking.dto.response.AdminVenueViewDto;
+import naitei.group5.workingspacebooking.dto.response.VenueDetailAdminResponseDto;
+import naitei.group5.workingspacebooking.exception.custom.VenueNotFoundException;
 import naitei.group5.workingspacebooking.service.VenueService;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -10,10 +12,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
+@RequestMapping("/admin")
 @RequiredArgsConstructor
 public class AdminVenueController extends BaseAdminController {
 
@@ -70,35 +74,60 @@ public class AdminVenueController extends BaseAdminController {
         return "admin/venues/verification";
     }
 
+    @GetMapping("/venues/{id}")
+    public String viewVenueDetail(
+            @PathVariable Integer id,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            VenueDetailAdminResponseDto venue = venueService.getVenueDetailAdmin(id);
+            model.addAttribute("venue", venue);
+            return "admin/venues/detail";
+        } catch (VenueNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "venue.admin.detail.notfound");
+            redirectAttributes.addFlashAttribute("venueId", id);
+            return "redirect:/admin/dashboard";
+        }
+    }
+
     @PatchMapping("/venues/{id}/approve")
     public String approveVenue(@PathVariable Integer id,
-                              @RequestParam(required = false, defaultValue = "unverified") String status,
-                              @RequestParam(required = false, defaultValue = "0") int page,
-                              @RequestParam(required = false, defaultValue = "20") int size,
                               RedirectAttributes redirectAttributes) {
         
-        venueService.approveVenue(id);
-        String message = messageSource.getMessage("venue.approve.success", 
-                null, 
-                LocaleContextHolder.getLocale());
-        redirectAttributes.addFlashAttribute("successMessage", message);
+        try {
+            venueService.approveVenue(id);
+            String message = messageSource.getMessage("venue.approve.success", 
+                    null, 
+                    LocaleContextHolder.getLocale());
+            redirectAttributes.addFlashAttribute("successMessage", message);
+        } catch (Exception e) {
+            String message = messageSource.getMessage("venue.error.approve", 
+                    new Object[]{id}, 
+                    LocaleContextHolder.getLocale());
+            redirectAttributes.addFlashAttribute("errorMessage", message);
+        }
         
-        return "redirect:/admin/venues/verification?status=" + status + "&page=" + page + "&size=" + size;
+        return "redirect:/admin/venues/" + id;
     }
 
     @PatchMapping("/venues/{id}/unverify")
     public String unverifyVenue(@PathVariable Integer id,
-                               @RequestParam(required = false, defaultValue = "unverified") String status,
-                               @RequestParam(required = false, defaultValue = "0") int page,
-                               @RequestParam(required = false, defaultValue = "20") int size,
                                RedirectAttributes redirectAttributes) {
         
-        venueService.unverifyVenue(id);
-        String message = messageSource.getMessage("venue.unverify.success", 
-                null, 
-                LocaleContextHolder.getLocale());
-        redirectAttributes.addFlashAttribute("successMessage", message);
+        try {
+            venueService.unverifyVenue(id);
+            String message = messageSource.getMessage("venue.unverify.success", 
+                    null, 
+                    LocaleContextHolder.getLocale());
+            redirectAttributes.addFlashAttribute("successMessage", message);
+        } catch (Exception e) {
+            String message = messageSource.getMessage("venue.error.unverify", 
+                    new Object[]{id}, 
+                    LocaleContextHolder.getLocale());
+            redirectAttributes.addFlashAttribute("errorMessage", message);
+        }
         
-        return "redirect:/admin/venues/verification?status=" + status + "&page=" + page + "&size=" + size;
+        return "redirect:/admin/venues/" + id;
     }
 }

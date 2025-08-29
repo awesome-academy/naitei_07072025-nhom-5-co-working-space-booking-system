@@ -297,14 +297,13 @@ public class VenueServiceImpl implements VenueService {
         };
     }
 
-        // ==== Admin venue verification methods ====
+    // ==== Admin venue verification methods ====
     private Venue loadActiveVenue(Integer id) {
         Venue venue = venueRepository.findById(id)
-                .orElseThrow(() -> new VenueNotFoundException(id));
+                .orElseThrow(() -> new VenueNotFoundException());
         
         if (venue.getDeleted()) {
-            throw new VenueVerificationException(
-                "operation", id, "Cannot perform operation on deleted venue");
+            throw new IllegalStateException(getMessage("venue.error.operation"));
         }
         
         return venue;
@@ -316,8 +315,7 @@ public class VenueServiceImpl implements VenueService {
         Venue venue = loadActiveVenue(id);
         
         if (Boolean.TRUE.equals(venue.getVerified())) {
-            throw new VenueVerificationException(
-                "approve", id, "Venue is already approved");
+            throw new IllegalStateException(getMessage("venue.approve.already"));
         }
         
         venue.setVerified(true);
@@ -330,12 +328,29 @@ public class VenueServiceImpl implements VenueService {
         Venue venue = loadActiveVenue(id);
         
         if (!Boolean.TRUE.equals(venue.getVerified())) {
-            throw new VenueVerificationException(
-                "unverify", id, "Venue is already unverified");
+            throw new IllegalStateException(getMessage("venue.unverify.already"));
         }
         
         venue.setVerified(false);
         venueRepository.save(venue);
+    }
+
+    @Override
+    public VenueDetailAdminResponseDto getVenueDetailAdmin(Integer venueId) {
+        var venue = venueRepository.findByIdWithAllDetails(venueId)
+                .orElseThrow(() -> new VenueNotFoundException());
+
+        // Lấy busy slots từ booking details hiện có
+        var busySlots = bookingDetailRepository.findByVenueId(venueId)
+                .stream()
+                .map(b -> new BusySlotDto(
+                        b.getStartTime(),
+                        b.getEndTime(),
+                        b.getBooking().getStatus().name().toLowerCase()
+                ))
+                .toList();
+
+        return ConverterDto.toVenueDetailAdminResponseDto(venue, busySlots);
     }
     
 }

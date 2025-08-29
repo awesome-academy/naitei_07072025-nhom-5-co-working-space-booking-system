@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin_layout}">
+
+<head>
+    <title th:text="#{venue.detail.title}">Chi tiết địa điểm</title>
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <!-- Flash Messages -->
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i>
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <h2 th:text="#{venue.detail.title}">Chi tiết địa điểm</h2>
+                
+                <!-- Basic Information Section -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 th:text="#{venue.detail.section.basic}">Thông tin cơ bản</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th th:text="#{venue.detail.field.name}">Tên:</th>
+                                        <td th:text="${venue.name}">-</td>
+                                    </tr>
+                                    <tr>
+                                        <th th:text="#{venue.detail.field.description}">Mô tả:</th>
+                                        <td th:text="${venue.description ?: '-'}">-</td>
+                                    </tr>
+                                    <tr>
+                                        <th th:text="#{venue.detail.field.capacity}">Sức chứa:</th>
+                                        <td th:text="${venue.capacity}">-</td>
+                                    </tr>
+                                    <tr>
+                                        <th th:text="#{venue.detail.field.location}">Địa điểm:</th>
+                                        <td th:text="${venue.location}">-</td>
+                                    </tr>
+                                    <tr>
+                                        <th th:text="#{venue.detail.field.style}">Loại địa điểm:</th>
+                                        <td th:text="${venue.venueStyleName ?: '-'}">-</td>
+                                    </tr>
+                                    <tr>
+                                        <th th:text="#{venue.detail.field.verified}">Xác thực:</th>
+                                        <td>
+                                            <span th:if="${venue.verified}" class="badge bg-success" th:text="#{common.yes}">Có</span>
+                                            <span th:unless="${venue.verified}" class="badge bg-warning" th:text="#{common.no}">Không</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-4" th:if="${venue.image}">
+                                <div class="text-center">
+                                    <h6 th:text="#{venue.detail.field.image}">Hình ảnh:</h6>
+                                    <img th:src="${venue.image}" th:alt="${venue.name}" 
+                                         class="venue-detail-image">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Actions Section -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 th:text="#{venue.actions.title}">Thao tác quản lý</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div th:if="${!venue.verified}" class="mb-3">
+                                    <div class="alert alert-warning" role="alert">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span th:text="#{venue.actions.unverified.message}">Địa điểm này chưa được xác thực. Bạn có muốn phê duyệt không?</span>
+                                    </div>
+                                    <form th:action="@{/admin/venues/{id}/approve(id=${venue.id})}" method="post" class="venue-action-form action-form-approve">
+                                        <input type="hidden" name="_method" value="patch">
+                                        <button type="submit" class="btn btn-success venue-approve-btn" 
+                                                th:data-confirm-message="#{venue.actions.confirm.approve}">
+                                            <i class="fas fa-check"></i> <span th:text="#{venue.actions.approve}">Phê duyệt</span>
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <div th:if="${venue.verified}" class="mb-3">
+                                    <div class="alert alert-success" role="alert">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span th:text="#{venue.actions.verified.message}">Địa điểm này đã được xác thực.</span>
+                                    </div>
+                                    <form th:action="@{/admin/venues/{id}/unverify(id=${venue.id})}" method="post" class="venue-action-form action-form-unverify">
+                                        <input type="hidden" name="_method" value="patch">
+                                        <button type="submit" class="btn btn-warning venue-unverify-btn" 
+                                                th:data-confirm-message="#{venue.actions.confirm.unverify}">
+                                            <i class="fas fa-times"></i> <span th:text="#{venue.actions.unverify}">Hủy xác thực</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Owner Section -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 th:text="#{venue.detail.section.owner}">Thông tin chủ sở hữu</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>ID:</th>
+                                <td th:text="${venue.owner.id}">-</td>
+                            </tr>
+                            <tr>
+                                <th th:text="#{common.name}">Tên:</th>
+                                <td th:text="${venue.owner.name}">-</td>
+                            </tr>
+                            <tr>
+                                <th th:text="#{common.email}">Email:</th>
+                                <td th:text="${venue.owner.email}">-</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Prices Section -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 th:text="#{venue.detail.prices.title}">Bảng giá</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(venue.prices)}">
+                            <p class="text-muted" th:text="#{venue.detail.prices.empty}">Chưa có thông tin giá.</p>
+                        </div>
+                        <div th:unless="${#lists.isEmpty(venue.prices)}">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Ngày trong tuần</th>
+                                        <th>Giờ bắt đầu</th>
+                                        <th>Giờ kết thúc</th>
+                                        <th>Đơn giá</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="price : ${venue.prices}">
+                                        <td th:text="${price.dayOfWeek}">-</td>
+                                        <td th:text="${price.timeStart}">-</td>
+                                        <td th:text="${price.timeEnd}">-</td>
+                                        <td>
+                                            <span th:text="${#numbers.formatDecimal(price.price, 0, 'COMMA', 0, 'POINT')}">0</span> VND
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Busy Slots Section -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 th:text="#{venue.detail.busySlots.title}">Khung giờ đã đặt</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(venue.busySlots)}">
+                            <p class="text-muted" th:text="#{venue.detail.busySlots.empty}">Không có khung giờ đã đặt.</p>
+                        </div>
+                        <div th:unless="${#lists.isEmpty(venue.busySlots)}">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Thời gian bắt đầu</th>
+                                        <th>Thời gian kết thúc</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="slot : ${venue.busySlots}">
+                                        <td th:text="${#temporals.format(slot.startTime, 'yyyy-MM-dd HH:mm')}">-</td>
+                                        <td th:text="${#temporals.format(slot.endTime, 'yyyy-MM-dd HH:mm')}">-</td>
+                                        <td>
+                                            <span th:if="${slot.status == 'booked'}" 
+                                                  class="badge bg-success" 
+                                                  th:text="#{venue.detail.status.booked}">Đã đặt</span>
+                                            <span th:if="${slot.status == 'pending'}" 
+                                                  class="badge bg-warning" 
+                                                  th:text="#{venue.detail.status.pending}">Đang chờ</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timestamps Section (nếu có dữ liệu) -->
+                <div class="card mt-4" th:if="${venue.createdAt != null or venue.updatedAt != null}">
+                    <div class="card-header">
+                        <h5>Thời gian</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <tr th:if="${venue.createdAt != null}">
+                                <th th:text="#{venue.detail.field.createdAt}">Ngày tạo:</th>
+                                <td th:text="${#temporals.format(venue.createdAt, 'yyyy-MM-dd HH:mm')}">-</td>
+                            </tr>
+                            <tr th:if="${venue.updatedAt != null}">
+                                <th th:text="#{venue.detail.field.updatedAt}">Ngày cập nhật:</th>
+                                <td th:text="${#temporals.format(venue.updatedAt, 'yyyy-MM-dd HH:mm')}">-</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="mt-4">
+                    <a href="/admin/venues" class="btn btn-secondary" th:text="#{common.cancel}">Quay lại</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
